@@ -6,6 +6,7 @@ import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import axios from '../../axiosOrders';
 import Spinner from '../../components/UI/Spinner/Spinner';
+import errorHandler from '../../hoc/ErrorHandler/ErrorHandler';
 
 // globally scoped.
 const INGREDIENT_PRICES = {
@@ -151,5 +152,5 @@ continueOrderHandler = () => {
   }
 }
 
-
-export default BurgerBuilder;
+// craeted a global error handler by wrapping the burgerbuilder with the HOC.
+export default errorHandler(BurgerBuilder, axios);
