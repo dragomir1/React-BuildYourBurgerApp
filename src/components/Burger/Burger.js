@@ -1,6 +1,8 @@
 import React from 'react';
 import classes from './Burger.css';
 import BurgerIngredient from './BurgerIngredient/BurgerIngredient';
+// withRouter is a HOC that allows us to gain access to the special URL match, location and history props in any component. if the component is not part of the routeable area of project.
+import { withRouter } from 'react-router-dom';
 
 // Object is a default js object. not provided by React.
 // keys method extracts the keys of a given object and turns it into an array. => an array of the keys.
@@ -44,4 +46,4 @@ const burger = (props) => {
   );
 };
 
-export default burger;
+export default withRouter(burger);
