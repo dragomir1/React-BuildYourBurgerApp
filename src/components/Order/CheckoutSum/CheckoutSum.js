@@ -4,7 +4,7 @@ import Button from '../../UI/Button/Button';
 import classes from './CheckoutSum.css';
 
 
-
+// activating the buttons for placing an order.
 const CheckoutSummary = (props) => {
   return (
       <div className={classes.CheckoutSummary}>
@@ -14,10 +14,10 @@ const CheckoutSummary = (props) => {
         </div>
         <Button
           btnType="Danger"
-          clicked>Cancel Order</Button>
+          clicked={props.checkoutCancelled}>Cancel Order</Button>
         <Button
           btnType="Success"
-          clicked>Submit Order</Button>
+          clicked={props.checkoutContinue}>Submit Order</Button>
 
       </div>
   );
