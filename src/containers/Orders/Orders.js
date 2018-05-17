@@ -54,6 +54,7 @@ class Orders extends Component {
             price={order.price} />
 
         ))}
+        
       </div>
     );
   }
