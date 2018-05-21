@@ -18,7 +18,11 @@ class ContactData extends Component {
           type: 'text',
           placeholder: 'Name',
         },
-      value: ''
+      value: '',
+      validation: {
+        required: true
+      },
+      valid: false
       },
       street: {
         elementType: 'input',
@@ -26,7 +30,11 @@ class ContactData extends Component {
           type: 'text',
           placeholder: 'Street',
         },
-      value: ''
+      value: '',
+      validation: {
+        required: true
+      },
+      valid: false
       },
       zipCode: {
         elementType: 'input',
@@ -34,7 +42,11 @@ class ContactData extends Component {
           type: 'text',
           placeholder: 'Zipcode',
         },
-      value: ''
+      value: '',
+      validation: {
+        required: true
+      },
+      valid: false
       },
       country: {
         elementType: 'input',
@@ -42,7 +54,11 @@ class ContactData extends Component {
           type: 'text',
           placeholder: 'Country',
         },
-      value: ''
+      value: '',
+      validation: {
+        required: true
+      },
+      valid: false
       },
       email: {
         elementType: 'input',
@@ -50,7 +66,11 @@ class ContactData extends Component {
           type: 'email',
           placeholder: 'Email',
         },
-      value: ''
+      value: '',
+      validation: {
+        required: true
+      },
+      valid: false
       },
       deliveryMethod: {
         elementType: 'select',
@@ -60,8 +80,8 @@ class ContactData extends Component {
             {value: 'cheapest', displayValue: 'cheapest'}
           ]
         },
-      value: ''
-      },
+      value: '',
+      }
     },
     loading: false
   }
@@ -70,15 +90,23 @@ class ContactData extends Component {
 // this method gets activalted when somebody clicks on the order button.
 // WE NEED ACCESS TO THE INDERGIENTS FROM CHECK OUT SO THAT WE PLACE OUR ORDER..THERE IS A TRICK FOR THAT.  LOOK AT CHECKOUT.JS AND NOTICE THAT THE COMPONENT PROP WAS CHAGNGED FOR RENDER PROP.
 // we add the preventDefault so that the form doesnt reload when we hit the order button.
-  orderHandler = (e) => {
-    e.preventDefault();
+  orderHandler = (event) => {
+    event.preventDefault();
     this.setState({loading: true})
     //USING POST BECUASE WE ARE STRORING DATA.
     // json extentions is just for firebase.
+    // this variable is what we use to submit information to the database.
+    const formData = {};
+    for (let formDataID in this.state.orderForm) {
+      formData[formDataID] = this.state.orderForm[formDataID].value;
+    }
+
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.price,
+      orderData: formData
     }
+// WE WAANT TO GET THE DATA FORM THE STATE.  WE ONLY CARE ABOUT THE NAME/VALUE PAIR.  IT NEEDS TO BE MAPPED TO EACH OTHER.
 
     axios.post('/orders.json', order)
     .then(response => {
@@ -90,11 +118,19 @@ class ContactData extends Component {
       this.setState({loading: false});
     });
   }
+// CREATING METHOD TO CHECK FOR INPUT VALIDATIONS.
+  checkValidation(value, rules) {
+    let isValid = false;
+    if(rules.required) {
+      isValid = value.trim() !== '';
+    }
+    return isValid;
+  }
 // LOADING THE SPINNER...setting up form variable as a defualt..ONCE DONE WE NEED TO REDIRECT AFTER PROPLE HIT THE ORDER BUTTON.
 
 // this is the onchanged handler that passed the prop that reacts to the user input...that gets the user input when they type data in.
 // we need two arguments one is the event(e) which we can find the targeted value.  the second arugment is the imputId..which needs to have a two way binding setup. the second argument reaches out to the state, gets the right element and adjusts it's value.
-inputChangedHandler = (event, inputId) => {
+inputChangedHandler = (event, inputIdentifier) => {
   // this logs it to console to see if it's working...
 console.log(event.target.value);
     const updatedOrderForm = {
@@ -104,11 +140,15 @@ console.log(event.target.value);
       // this is how to clone deeply.  cloning all the nested elements in state.
 
     const updatedFormElement = {
-      ...updatedOrderForm[inputId]
+      ...updatedOrderForm[inputIdentifier]
     };
-    updatedFormElement.value = event.target.values;
-    updatedOrderForm[inputId] = updatedFormElement;
-    this.setState({orderform: updatedOrderForm});
+
+// ONCE WE ADDED VALIDATIONS AND CREATE THE CHECKVALIDATION METHOD. WE NEED TO UPDATED THE VALID VALUE OF THE updatedFormElement element.
+    updatedFormElement.value = event.target.value;
+    updatedFormElement.valid = this.checkValidation(updatedFormElement.value, updatedFormElement.validation);
+    updatedOrderForm[inputIdentifier] = updatedFormElement;
+    console.log(updatedFormElement);
+    this.setState({orderForm: updatedOrderForm});
   };
 
   render () {
@@ -124,8 +164,11 @@ console.log(event.target.value);
         });
       }
 // the method applied to change, should be an anonymous funtion can we can pass arguments to the method.  we are creating a two way-binding.  we get and pass the event object, created by react. and we we pass the id, or the identifier, which are the keys in our form state ie: name, street, zipcode.
+
+
+// React has an onSubmit event handler to use when we submit a form.
     let form = (
-                <form>
+                <form onSubmit={this.orderHandler}>
                   {formElementArray.map(formElement => (
                     <Input
                       key={formElement.id}
@@ -134,7 +177,7 @@ console.log(event.target.value);
                       value={formElement.config.value}
                       changed={(event) => this.inputChangedHandler(event, formElement.id)} />
                   ))}
-                  <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+                  <Button btnType="Success">ORDER</Button>
                 </form>);
     if(this.state.loading) {
       form = <Spinner />;
