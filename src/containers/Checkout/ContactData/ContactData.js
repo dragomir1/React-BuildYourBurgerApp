@@ -10,6 +10,7 @@ class ContactData extends Component {
   // EACH PROPERTY REPRESENTS ONE INPUT I WANT TO CREATE.
   // NOW WE MUST DEFINE HOW THE IPUT SHOOULD LOOK LIKE.
   // THE elementConfig, DEIFES THE CONFIGURATION, THE NORMAL ATTRIBUTES WE CAN SET UP FOR THE CHOSEN HTML TAG. this is what will be distirbuted over the created input
+  // touched key sets us up so that it tracks whether the user added an input. it only checks the validity only if the element was touched.
   state = {
     orderForm: {
       name: {
@@ -22,7 +23,8 @@ class ContactData extends Component {
       validation: {
         required: true
       },
-      valid: false
+      valid: false,
+      touched: false
       },
       street: {
         elementType: 'input',
@@ -34,7 +36,8 @@ class ContactData extends Component {
       validation: {
         required: true
       },
-      valid: false
+      valid: false,
+      touched: false
       },
       zipCode: {
         elementType: 'input',
@@ -43,10 +46,14 @@ class ContactData extends Component {
           placeholder: 'Zipcode',
         },
       value: '',
+
       validation: {
-        required: true
+        required: true,
+        minLength: 5,
+        maxLength: 5
       },
-      valid: false
+      valid: false,
+      touched: false
       },
       country: {
         elementType: 'input',
@@ -58,7 +65,8 @@ class ContactData extends Component {
       validation: {
         required: true
       },
-      valid: false
+      valid: false,
+      touched: false
       },
       email: {
         elementType: 'input',
@@ -70,7 +78,8 @@ class ContactData extends Component {
       validation: {
         required: true
       },
-      valid: false
+      valid: false,
+      touched: false
       },
       deliveryMethod: {
         elementType: 'select',
@@ -81,8 +90,12 @@ class ContactData extends Component {
           ]
         },
       value: '',
+      // this solves the error with the drop down. since there is no validaiton, it's nieter true nor false. adding this validaiton makes all the controls congfigured equally.
+      validation: {},
+      valid: true
       }
     },
+    formIsValid: false,
     loading: false
   }
 
@@ -120,10 +133,20 @@ class ContactData extends Component {
   }
 // CREATING METHOD TO CHECK FOR INPUT VALIDATIONS.
   checkValidation(value, rules) {
-    let isValid = false;
+    // THIS FIXES THE VALIDAITON FLAW MENTIONED BELOW.
+    let isValid = true;
     if(rules.required) {
-      isValid = value.trim() !== '';
+      isValid = value.trim() !== '' && isValid;
     }
+// THIS IS FLAWED BECUASE WE'RE CHECING FOR VALUE LENGTHS ONE AFTER THE OTHER. TO FIX THE VALIDATION FLAW WE SET THE ISVALID VARIABLE TO TRUE.
+    if(rules.minLength) {
+      isValid = value.length >= rules.minLength && isValid;
+    }
+
+    if(rules.maxLength) {
+      isValid = value.length <= rules.maxLength && isValid;
+    }
+
     return isValid;
   }
 // LOADING THE SPINNER...setting up form variable as a defualt..ONCE DONE WE NEED TO REDIRECT AFTER PROPLE HIT THE ORDER BUTTON.
@@ -145,10 +168,18 @@ console.log(event.target.value);
 
 // ONCE WE ADDED VALIDATIONS AND CREATE THE CHECKVALIDATION METHOD. WE NEED TO UPDATED THE VALID VALUE OF THE updatedFormElement element.
     updatedFormElement.value = event.target.value;
-    updatedFormElement.valid = this.checkValidation(updatedFormElement.value, updatedFormElement.validation);
+    updatedFormElement.valid = this.checkValidation(updatedFormElement.value,
+    updatedFormElement.validation);
+    updatedFormElement.touched = true;
     updatedOrderForm[inputIdentifier] = updatedFormElement;
-    console.log(updatedFormElement);
-    this.setState({orderForm: updatedOrderForm});
+
+// CHECKING AND LOOPING THROUGH FORM ELEMNTS TO CHECK IF THE ENTIRE FORM IS VALID. THE PROBLEM IS THAT DOING IT THIS WAY, ONLY THE LAST CHECK DETERMINES THE VALUE OF formIsValid. SO WE NEED TO SET THE FORM TO TRUE.
+      // this checks if the given element is true and if the form in general is true as well. if both is the case, then formIsValid is updated to true.
+    let formIsValid = true;
+    for(let inputIds in updatedOrderForm){
+      formIsValid = updatedOrderForm[inputIds].valid && formIsValid;
+    }
+    this.setState({orderForm: updatedOrderForm, formIsValid: formIsValid});
   };
 
   render () {
@@ -167,6 +198,9 @@ console.log(event.target.value);
 
 
 // React has an onSubmit event handler to use when we submit a form.
+
+{/*should validate should not work on the dropdown. it should only be red if there is a validation object.*/}
+// we bind the disabled attribute on the button to the state and this will disable the button if form is not valid.
     let form = (
                 <form onSubmit={this.orderHandler}>
                   {formElementArray.map(formElement => (
@@ -174,10 +208,13 @@ console.log(event.target.value);
                       key={formElement.id}
                       elementType={formElement.config.elementType}
                       elementConfig={formElement.config.elementConfig}
+                      invalid={!formElement.config.valid}
+                      shouldValidate={formElement.config.validation}
+                      touched={formElement.config.touched}
                       value={formElement.config.value}
                       changed={(event) => this.inputChangedHandler(event, formElement.id)} />
                   ))}
-                  <Button btnType="Success">ORDER</Button>
+                  <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
                 </form>);
     if(this.state.loading) {
       form = <Spinner />;
