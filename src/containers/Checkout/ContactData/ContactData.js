@@ -90,7 +90,7 @@ class ContactData extends Component {
           ]
         },
       value: '',
-      // this solves the error with the drop down. since there is no validaiton, it's nieter true nor false. adding this validaiton makes all the controls congfigured equally.
+      // this solves the error with the drop down. since there is no validaiton, it's nieter true nor false. adding this validaiton makes all the controls congfigured equally.  
       validation: {},
       valid: true
       }

@@ -7,6 +7,8 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import axios from '../../axiosOrders';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import errorHandler from '../../hoc/ErrorHandler/ErrorHandler';
+import { connect } from 'react-redux';
+import * as actionTypes from '../../store/actions';
 
 // globally scoped.
 const INGREDIENT_PRICES = {
@@ -20,16 +22,17 @@ const INGREDIENT_PRICES = {
 class BurgerBuilder extends Component {
 
   state = {
-    ingredients: {
-      lettuce: 0,
-      bacon: 0,
-      cheese: 0,
-      meat: 0
-    },
+    // ingredients: {
+    //   lettuce: 0,
+    //   bacon: 0,
+    //   cheese: 0,
+    //   meat: 0
+    // },
     totalPrice: 0,
     toBePurchased: false,
     purchasing: false,
-    loading: false
+    loading: false,
+    error: false
   }
 
 updatePurchaseState (ingredients) {
@@ -122,13 +125,13 @@ continueOrderHandler = () => {
 
   render() {
     const disabledInfo = {
-      ...this.state.ingredients
+      ...this.props.ings
     };
     for (let key in disabledInfo) {
       disabledInfo[key] = disabledInfo[key] <=0
     }
     let orderSummary = <OrderSummary
-      ingredients={this.state.ingredients}
+      ingredients={this.props.ings}
       price={this.state.totalPrice}
       purchasedCancelled={this.cancelOrderHandler}
       purchaseContinue={this.continueOrderHandler} />;
@@ -143,10 +146,10 @@ continueOrderHandler = () => {
         {orderSummary}
       </Modal>
         <Burger
-        ingredients={this.state.ingredients} />
+        ingredients={this.props.ings} />
         <BuildControls
-          ingredientAdded={this.addIngredientHandler}
-          ingredientRemoved={this.removeIngredientHandler}
+          ingredientAdded={this.props.onIngredientAdded}
+          ingredientRemoved={this.props.onIngredientRemoved}
           disabled={disabledInfo}
           toBePurchased={this.state.toBePurchased}
           ordered={this.purchaseHandler}
@@ -155,6 +158,21 @@ continueOrderHandler = () => {
     );
   }
 }
+// this returns an object that defines which propotery should hold which slice of the state
+const mapStateToProps = state => {
+  return {
+    ings: state.ingredients
+  };
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onIngredientAdded: (ingName) => dispatch({type: actionTypes.ADD_INGREDIENT, ingredientName: ingName}),
+    onIngredientRemoved: (ingName) => dispatch({type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingName})
+  }
+}
 
 // craeted a global error handler by wrapping the burgerbuilder with the HOC.
-export default errorHandler(BurgerBuilder, axios);
+// connect is a function that we pass mapStateToProps and mapDispatchToProps as arguments
+// we also pass the entire errorHandler call as an argument to this connect function call that returns us.
+export default connect(mapStateToProps, mapDispatchToProps)(errorHandler(BurgerBuilder, axios));
