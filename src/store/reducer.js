@@ -6,9 +6,11 @@ const initialState = {
     bacon: 0,
     cheese: 0,
     meat: 0
+    slicesdeletethis: "delete this...."
   },
   totalPrice: 0,
 }
+
 
 // this creates a deep clone
       // return {
