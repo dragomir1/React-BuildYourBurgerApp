@@ -5,6 +5,7 @@ import classes from './ContactData.css';
 import axios from '../../../axiosOrders';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Forms/Input/Input';
+import { connect } from 'react-redux';
 
 class ContactData extends Component {
   // EACH PROPERTY REPRESENTS ONE INPUT I WANT TO CREATE.
@@ -90,7 +91,7 @@ class ContactData extends Component {
           ]
         },
       value: '',
-      // this solves the error with the drop down. since there is no validaiton, it's nieter true nor false. adding this validaiton makes all the controls congfigured equally.  
+      // this solves the error with the drop down. since there is no validaiton, it's nieter true nor false. adding this validaiton makes all the controls congfigured equally.
       validation: {},
       valid: true
       }
@@ -115,7 +116,7 @@ class ContactData extends Component {
     }
 
     const order = {
-      ingredients: this.props.ingredients,
+      ingredients: this.props.ings,
       price: this.props.price,
       orderData: formData
     }
@@ -231,4 +232,12 @@ console.log(event.target.value);
 
 }
 
-export default ContactData;
+const mapStateToProps = state => {
+  return {
+    ings: state.ingredients,
+    price: state.totalPrice
+  }
+};
+
+
+export default connect(mapStateToProps)(ContactData);

@@ -23,7 +23,7 @@ class BurgerBuilder extends Component {
     //   meat: 0
     // },
     // totalPrice: 0,
-    toBePurchased: false,
+    // toBePurchased: false,
     purchasing: false,
     loading: false,
     error: false
@@ -41,7 +41,8 @@ updatePurchaseState (ingredients) {
   .reduce((sum, el) => {
     return sum + el;
   }, 0);
-    this.setState({toBePurchased: sum > 0});
+  // this.setState({toBePurchased: sum > 0});
+    return sum > 0;
 }
 
 // addIngredientHandler = (type) => {
@@ -85,33 +86,32 @@ cancelOrderHandler = () => {
 
 continueOrderHandler = () => {
 
-
-
 // BUILDING THE LOGIC TO PASS THE INGREDIENTS WE PICKED ON TO THE CHECKOUT CONTAINER USEING QUERY PARAMS.
 // we are passing ingredients through a search query. we set the search paramter to an empty string.
 // then we are encoding the igredients into a search query by creating an array...
 
-  const queryParams = [];
-  // looping through the state and adding elements to the queryParams array
-  // encodeURIComponent IS A JS PROVIDED HELPER METHOD THAT ENCODES ELEMENTS SUCH THAT THEY CAN BE USED IN THE URL. we need an "=".  in params its "key = something..."
-  for(let i in this.state.ingredients) {
-    // this is basically a an array that has a couple of strings: property name plus the value of that property.
-    //
-    queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]))
-  }
-// then we take that array of strings and join them with an '&' sign.
+//   const queryParams = [];
+//   // looping through the state and adding elements to the queryParams array
+//   // encodeURIComponent IS A JS PROVIDED HELPER METHOD THAT ENCODES ELEMENTS SUCH THAT THEY CAN BE USED IN THE URL. we need an "=".  in params its "key = something..."
+//   for(let i in this.state.ingredients) {
+//     // this is basically a an array that has a couple of strings: property name plus the value of that property.
+//     //
+//     queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]))
+//   }
+// // then we take that array of strings and join them with an '&' sign.
+//
+// //  WHEN WE HIT CONTINUE BUTTON..AND GETS SENG TO THE CHECKOUT..IT NEEDS TO BE PARCED.
+//
+// //  WE NEED TO PASS THE TOTAL PROCE ALONG WITH THE INGEDIENTS TO THE CHECKOUT CONTAINER.
+//   queryParams.push('price=' + this.state.totalPrice);
+//
+//   const queryString = queryParams.join('&');
+  this.props.history.push('/checkout');
 
-//  WHEN WE HIT CONTINUE BUTTON..AND GETS SENG TO THE CHECKOUT..IT NEEDS TO BE PARCED.
-
-//  WE NEED TO PASS THE TOTAL PROCE ALONG WITH THE INGEDIENTS TO THE CHECKOUT CONTAINER.
-  queryParams.push('price=' + this.state.totalPrice);
-
-  const queryString = queryParams.join('&');
-
-  this.props.history.push({
-      pathname: "/checkout",
-      search: '?' + queryString
-  });
+  // this.props.history.push({
+  //     pathname: "/checkout",
+  //     search: '?' + queryString
+  // });
 
 
 
@@ -145,7 +145,7 @@ continueOrderHandler = () => {
           ingredientAdded={this.props.onIngredientAdded}
           ingredientRemoved={this.props.onIngredientRemoved}
           disabled={disabledInfo}
-          toBePurchased={this.state.toBePurchased}
+          toBePurchased={this.updatePurchaseState(this.props.ings)}
           ordered={this.purchaseHandler}
           price={this.props.price}/>
       </Aux>
