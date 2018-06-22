@@ -4,11 +4,13 @@ import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
-import axios from '../../axiosOrders';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import errorHandler from '../../hoc/ErrorHandler/ErrorHandler';
+// connecting the burgerBuilder container to the store. this is a wrapper that we use on the export.
 import { connect } from 'react-redux';
-import * as actionTypes from '../../store/actions';
+// import * as actionTypes from '../../store/actions';
+import * as actionCreators from '../../store/actions/index';
+import axios from '../../axiosOrders';
 
 
 
@@ -16,17 +18,11 @@ import * as actionTypes from '../../store/actions';
 class BurgerBuilder extends Component {
 
   state = {
-    // ingredients: {
-    //   lettuce: 0,
-    //   bacon: 0,
-    //   cheese: 0,
-    //   meat: 0
-    // },
-    // totalPrice: 0,
-    // toBePurchased: false,
-    purchasing: false,
-    loading: false,
-    error: false
+    purchasing: false
+  }
+// this is the last step...once you ADD the function to mapDispatchToProps, we need to mount it.
+  componentDidMount () {
+    this.props.onInitIngredients();
   }
 
 updatePurchaseState (ingredients) {
@@ -34,17 +30,18 @@ updatePurchaseState (ingredients) {
   // we map the array we created into the array we need.  we just want values.
   const sum = Object.keys(ingredients)
   .map(igKey => {
-    return ingredients[igKey]
+    return ingredients[igKey];
   })
   // reduce the array into a single number.  the sum of all ingredients. we start at 0. then we have a function that is executed on each element of the array. the function takes two arguments.
   // "sum" is the consistently updated current sum. so when it finishes the itteration, the sum is the most current update.
   .reduce((sum, el) => {
     return sum + el;
   }, 0);
+  // WE ARE RETURNING THE RESULT OF OUR BOOLEAN CHECK. THEN WE CALL THIS HANDLER IN THE BUILD CONTROLS AND PASS THE INGREDIENTS.
   // this.setState({toBePurchased: sum > 0});
     return sum > 0;
 }
-
+// WE REMOVE THIS ADD AND REMOVE INGREDIENTS HANDLERS BECAUSE NOW IT'S HANDLED BY REDUX.
 // addIngredientHandler = (type) => {
 //   const oldCount = this.state.ingredients[type];
 //   const updatedCount = oldCount + 1;
@@ -106,15 +103,19 @@ continueOrderHandler = () => {
 //   queryParams.push('price=' + this.state.totalPrice);
 //
 //   const queryString = queryParams.join('&');
+
+// here we dispatch the purchaseInit action.  in the reducer, we add a new proptery to the state where we set puchasing to 'false' which is then set to true once the purchase is finished so that we then redirect.
+// we now add the switch statement in the order reducer.
+// this is the place where we want to initalize the purchase.  before we push to the checkout page
+  this.props.onInitPurchase();
+
+
   this.props.history.push('/checkout');
 
   // this.props.history.push({
   //     pathname: "/checkout",
   //     search: '?' + queryString
   // });
-
-
-
 }
 
   render() {
@@ -124,46 +125,70 @@ continueOrderHandler = () => {
     for (let key in disabledInfo) {
       disabledInfo[key] = disabledInfo[key] <=0
     }
-    let orderSummary = <OrderSummary
-      ingredients={this.props.ings}
-      price={this.props.price}
-      purchasedCancelled={this.cancelOrderHandler}
-      purchaseContinue={this.continueOrderHandler} />;
 
     if(this.state.loading) {
       orderSummary = <Spinner />
     }
 
-    return (
+    let orderSummary = null;
+    let burger = this.props.error ? <p>Can't be loaded</p> : <Spinner />;
+
+    if (this.props.ings) {
+    burger = (
       <Aux>
-      <Modal show={this.state.purchasing} modalClosed={this.cancelOrderHandler}>
-        {orderSummary}
-      </Modal>
         <Burger
         ingredients={this.props.ings} />
         <BuildControls
           ingredientAdded={this.props.onIngredientAdded}
           ingredientRemoved={this.props.onIngredientRemoved}
           disabled={disabledInfo}
+          {/*WE CALL THIS HANDELER AND PASS THE INGREDIENTS TO RETURN THE RESULTS OF THIS FUNCITON CALL. WE WANT TO EXECUTE THIS BECUASE WE WANT THE UPDTED RESULTS EVERYTIME IT GETS REDEERED.  OTHERWISE HOW ARE YOU GOING TO KNOW THE ORDER?*/}
           toBePurchased={this.updatePurchaseState(this.props.ings)}
           ordered={this.purchaseHandler}
-          price={this.props.price}/>
+          price={this.props.price} />
+      </Aux>
+    );
+    orderSummary = <OrderSummary
+      ingredients={this.props.ings}
+      price={this.props.price}
+      purchasedCancelled={this.cancelOrderHandler}
+      purchaseContinue={this.continueOrderHandler} />;
+  }
+    return (
+      <Aux>
+        <Modal show={this.state.purchasing} modalClosed={this.cancelOrderHandler}>
+            {orderSummary}
+        </Modal>
+        {burger}
       </Aux>
     );
   }
 }
-// this returns an object that defines which propotery should hold which slice of the state
+
+// THIS FETCHES FROM THE GLOBAL STATE.  this returns an object that defines which propotery should hold which slice of the state. Once we combine reducers and give is a different name for the key property, we need to add it here.
 const mapStateToProps = state => {
   return {
-    ings: state.ingredients,
-    price: state.totalPrice
+    // ONCE YOU ADD THESE PROPERIES TO BE MAPPED TO THE STATE, WE NEED TO FIND ALL OCCURANCES OF THAT STATE WITHIN THE CONTAINER AND REPLACE IT WITH THIS.PROPS.PROPERTYNAME.
+
+    // the 'burgerBuilder' and 'order' prop names comes from the index.js file. this is the prop name we used when we combined reducers.  we need to match the state to the prop name that was given in the index file.
+    ings: state.burgerBuilder.ingredients,
+    price: state.burgerBuilder.totalPrice,
+    // once we set the FETCH_INGREDIENTS_FAIL reducer and it's logic, we need to get info about an error.
+    error: state.burgerBuilder.error,
+    purchased: state.order.purchased
   };
 }
-
+// // the second argument. which kind of actions you want to dispatch in the container.
+// we return a js object where we define some prop names which holds a reference to a function which will get executed to dispatch an action.
+// "dispatch()" will available throught the onIncrementCounter property. when the property is executed as a function. then the dispatch() is going to get executed.
 const mapDispatchToProps = dispatch => {
   return {
-    onIngredientAdded: (ingName) => dispatch({type: actionTypes.ADD_INGREDIENT, ingredientName: ingName}),
-    onIngredientRemoved: (ingName) => dispatch({type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingName})
+    onIngredientAdded: (ingName) => dispatch(actionCreators.addIngredient(ingName)),
+    onIngredientRemoved: (ingName) => dispatch(actionCreators.removeIngredient(ingName)),
+    // ONCE WE DISPATCH THIS ACTION, WE NEED TO CALL IT IN componentDidMount METHOD.
+    onInitIngredients: () => dispatch(actionCreators.initIngredients()),
+    // we are reapdy to dispatch this action where we initialize the burger purchase action. we call it right before we push to the checkout.
+    onInitPurchase: () => dispatch(actionCreators.purchaseInit())
   }
 }
 

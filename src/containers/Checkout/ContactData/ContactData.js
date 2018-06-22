@@ -5,7 +5,11 @@ import classes from './ContactData.css';
 import axios from '../../../axiosOrders';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Forms/Input/Input';
+// wer're connecting this CONTAINER to redux.
 import { connect } from 'react-redux';
+import ErrorHandler from '../../../hoc/ErrorHandler/ErrorHandler';
+import * as actions from '../../../store/actions/index';
+
 
 class ContactData extends Component {
   // EACH PROPERTY REPRESENTS ONE INPUT I WANT TO CREATE.
@@ -90,14 +94,16 @@ class ContactData extends Component {
             {value: 'cheapest', displayValue: 'cheapest'}
           ]
         },
-      value: '',
+        value: 'fastest',
+      // value: '',
       // this solves the error with the drop down. since there is no validaiton, it's nieter true nor false. adding this validaiton makes all the controls congfigured equally.
       validation: {},
       valid: true
       }
     },
     formIsValid: false,
-    loading: false
+    // now that we're doing loadig throug redux, we don't need this in state.
+    // loading: false
   }
 
 
@@ -106,7 +112,10 @@ class ContactData extends Component {
 // we add the preventDefault so that the form doesnt reload when we hit the order button.
   orderHandler = (event) => {
     event.preventDefault();
-    this.setState({loading: true})
+    // WE ARE NOW HANDLING LOADING THROUGH THE REDUX.
+    // this.setState({loading: true})
+
+
     //USING POST BECUASE WE ARE STRORING DATA.
     // json extentions is just for firebase.
     // this variable is what we use to submit information to the database.
@@ -120,17 +129,19 @@ class ContactData extends Component {
       price: this.props.price,
       orderData: formData
     }
+// once we dispatch the action to MAPSTATETODISPATCH, we need to pass it the the orderhandler function. and then execute it as well as pass the order
+    this.props.onBurgerOrder(order);
 // WE WAANT TO GET THE DATA FORM THE STATE.  WE ONLY CARE ABOUT THE NAME/VALUE PAIR.  IT NEEDS TO BE MAPPED TO EACH OTHER.
 
-    axios.post('/orders.json', order)
-    .then(response => {
-      this.setState({loading: false});
-      // once we pass the props from the checkout we have access to the history prop and are able to use the push method on it to redirect to index page. on ce users click "order"
-      this.props.history.push('/');
-    })
-    .catch(error => {
-      this.setState({loading: false});
-    });
+    // axios.post('/orders.json', order)
+    // .then(response => {
+    //   this.setState({loading: false});
+    //   // once we pass the props from the checkout we have access to the history prop and are able to use the push method on it to redirect to index page. on ce users click "order"
+    //   this.props.history.push('/');
+    // })
+    // .catch(error => {
+    //   this.setState({loading: false});
+    // });
   }
 // CREATING METHOD TO CHECK FOR INPUT VALIDATIONS.
   checkValidation(value, rules) {
@@ -217,7 +228,8 @@ console.log(event.target.value);
                   ))}
                   <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
                 </form>);
-    if(this.state.loading) {
+                // THE LOADING STATE ALSO NEED TO GO THROUGH REDUX BEUCASE THE ORDERING PROCESS IS THROUGH REDUX.
+    if(this.props.loading) {
       form = <Spinner />;
     }
 
@@ -231,13 +243,24 @@ console.log(event.target.value);
   }
 
 }
+// now that we added purchaseBurgerStart in our order.js reducers.  we need to make sure we have access to the loading prop we get from redux.
+// once we have access to the loading prop.  we need to replace all istances of "this.state.loading" to "this.props.loading"
 
+    // the 'burgerBuilder' and 'order' prop names comes from the index.js file. this is the prop name we used when we combined reducers.  we need to match the state to the prop name that was given in the index file.
 const mapStateToProps = state => {
   return {
-    ings: state.ingredients,
-    price: state.totalPrice
+    ings: state.burgerBuilder.ingredients,
+    price: state.burgerBuilder.totalPrice,
+    loading: state.order.loading
   }
 };
 
+// we are connecting this container to the dispatchable actions that were just created.
+const mapDispatchToProps = dispatch => {
+  return {
+    onBurgerOrder: (orderData) => dispatch(actions.purchaseBurger(orderData))
+  };
+};
 
-export default connect(mapStateToProps)(ContactData);
+
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorHandler(ContactData, axios));

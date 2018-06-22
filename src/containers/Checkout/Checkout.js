@@ -1,14 +1,20 @@
+// we use redux in this file beucase we need to have access to the ingredients in the redux store.  WE're passing our ingredients through the checkout container.  so it makes sense.
+
+
 import React, { Component } from 'react';
 import CheckoutSum from '../../components/Order/CheckoutSum/CheckoutSum';
-// Loading the ContactData component through routing.
-import { Route } from 'react-router-dom';
+// Loading the ContactData component through routing. REDIRECT allows you to redirect.
+import { Route, Redirect } from 'react-router-dom';
 // after importing the route we need to import the component we are loading. which is the ContactData component.
 import ContactData from './ContactData/ContactData';
+// we import connect so we can connect this container to the store as well.
 import { connect } from 'react-redux';
+import * as actions from '../../store/actions/index';
 
 
 
 class Checkout extends Component {
+
     // state = {
     //   ingredients: null,
     //   price: 0
@@ -54,28 +60,41 @@ checkoutContinueHandler = () => {
 // REPLACE Component WITH RENDER PROP SO THAT WE CAN PASS PROPS TO THE ContactData Component
 
 // WE NEED TO REDIRECT ONCE THE USER CLIKS ON THE ORDER BUTTON.  WE PASS PROPS IN THE RENDER METHOD..we pass the props as a parmater then we spread operator to pass what ever we get in the props to the contact data. inclduing the history prop.
+// THE SUMMARY BY DEFAULT REDIRECTS YOU TO THE MAIN PAGE IF THERE ARE NO INGREDIENTS PRESENT.
   render () {
-    return (
-      <div>
-        <CheckoutSum
-          ingredients={this.props.ings}
-          checkoutCancelled={this.checkoutCancelledHandler}
-          checkoutContinue={this.checkoutContinueHandler} />
-          <Route path={this.props.match.path + '/contact-data'}
+     let summary = <Redirect to="/" />
+     {/*if purchased is true.  we want to redirect*/}
+      if(this.props.ings) {
+        // this line of code says if purchaseing is true then redirect. otherwise we're still in the purchasing process so don't redirect.
+        const purchasedRedirect = this.props.purchased ? <Redirect to="/" /> : null
+        summary = (
+        <div>
+          // we now render it if its true. so the code below won't matter.
+          {purchasedRedirect}
+          <CheckoutSum
+            ingredients={this.props.ings}
+            checkoutCancelled={this.checkoutCancelledHandler}
+            checkoutContinue={this.checkoutContinueHandler} />
+          <Route
+            path={this.props.match.path + '/contact-data'}
             component={ContactData} />
-
-      </div>
-    );
+        </div>
+        );
+      }
+    return summary;
   }
 }
 // return a JS object where we map the redux state to the props of this container.
+    // the 'burgerBuilder'  and 'order' prop names comes from the index.js file. this is the prop name we used when we combined reducers.  we need to match the state to the prop name that was given in the index file.
 const mapStateToProps = state => {
   return {
-      ings: state.ingredients
+      ings: state.burgerBuilder.ingredients,
+      // we map this to props to gain access to the purchased property.  we then can use this to redirct if it's true or false.
+      purchased: state.order.purchased
   }
 };
 
-// DON'T NEED mapDispatchToProps.  WE ARE NOT DISPATCHING ANYTHING...
+
 
 
 
