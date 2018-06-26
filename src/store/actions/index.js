@@ -14,5 +14,6 @@ export { purchaseBurger,
 
 export { auth,
          authSuccess,
-         authFail
-} from './auth'; 
+         authFail,
+         logout
+} from './auth';
