@@ -39,12 +39,21 @@ const authFail = (state = initialState, action) => {
   });
 };
 
+// this is a new reducer to reset the logout state after the time expired.
+const authLogout = (state = initialState, action) => {
+    return updateObject(state, {
+      token: null,
+      userId: null
+    });
+};
+
 // ONCE WE ARE DONE HERE WE NEED TO COMBINE THE REDUCERS => GO TO THE INDEX.JS FILE.
 const reducer = (state = initialState, action) => {
     switch (action.type) {
       case actionTypes.AUTH_START: return authStart(state, action);
       case actionTypes.AUTH_SUCCESS: return authSuccess(state, action);
       case actionTypes.AUTH_FAIL: return authFail(state, action);
+      case actionTypes.AUTH_LOGOUT: return authLogout(state, action);
       default:
       return state;
     }

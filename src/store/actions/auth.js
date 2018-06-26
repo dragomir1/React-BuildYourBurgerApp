@@ -26,12 +26,27 @@ export const authFail = (error) => {
   };
 };
 
+
+// this is a logout action creator that we'll be using internally in the checkAuthTimeout.
+// this logout action creator will be used in setTimeout within the checkAuthTimeout function.
+export const logout = () => {
+  return {
+    type: actionTypes.AUTH_LOGOUT,
+  };
+};
+
 // if the token expires after a set time, that token will no loger exist. so if you are logged in and the token expires, you're in a akward space. so we need to update the UI that we are logged out after the token expires.
 // invalid the the token after one hour, then upate the UI once the token is no longer there
 // we are running asynch code here...
+// setting up a setTimeout function with a NEW logout action.
+// AFTER THIS NEED TO ADD LOGOUT IN THE REDUCER.
+// setTimeout uses time in miliseconds.  so you need to multipley by 1000 to add 1 second etc..expirationTime is 3600 miliseconds in setTimeout.  we times it by 1000 this will produce 3600 seconds.
 export const checkAuthTimeout = (expirationTime) => {
   return dispatch => {
+    setTimeout(() => {
+      dispatch(logout());
 
+    }, expirationTime * 1000);
   };
 };
 
