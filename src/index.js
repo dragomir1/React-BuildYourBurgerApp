@@ -22,15 +22,18 @@ import thunk from 'redux-thunk';
 // to combine reducers, we need to import both files.
 import burgerBuilderReducer from './store/reducers/burgerBuilder';
 import orderReducer from './store/reducers/order';
+import authReducer from './store/reducers/auth';
 
 
 // this sets up the redux devtools store in the browser. this goes before the store is created.
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 // THIS CONST COMBINES BOTH REDUCERS INTO ONE JS OBJECT.  WE THEN PASS IT TO createStore.  THIS APP WILL BREAK  BECUASE WE HAVE DIFFERENT SLICES OF STATE => burgerBuilder AND order.  WE NEED TO UPDATE THIS IN THE CONTAINER THAT UTILIZES THESE REDUCERS.
+// THIS IS THE GLOBAL ROOT REDUCER. 
 const rootReducer = combineReducers({
   burgerBuilder: burgerBuilderReducer,
-  order: orderReducer
+  order: orderReducer,
+  auth: authReducer
 });
 // the second argument sets up our redux dev tools.
 // const store = createStore(burgerBuilderReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());

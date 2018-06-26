@@ -8,7 +8,11 @@ export { addIngredient,
  // ONCE WE EXPORT PURCHASE_INIT, WE GO TO OUR Checkout CONTAINER AND LOAD IT IN componentDidMount.
 export { purchaseBurger,
          purchaseInit,
-
          // once we do this we need to load it in componentDidMount as well as dispatch it in the orders container.
          fetchOrders
 } from './order';
+
+export { auth,
+         authSuccess,
+         authFail
+} from './auth'; 

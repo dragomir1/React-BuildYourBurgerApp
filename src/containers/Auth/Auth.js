@@ -4,6 +4,13 @@ import React, { Component } from 'react';
 import Input from '../../components/UI/Forms/Input/Input';
 import Button from '../../components/UI/Button/Button';
 import classes from './Auth.css';
+import * as actions from '../../store/actions/index';
+import Spinner from '../../components/UI/Spinner/Spinner';
+
+// we're connecting this CONTAINER to redux.
+import { connect } from 'react-redux';
+import ErrorHandler from '../../hoc/ErrorHandler/ErrorHandler';
+import axios from '../../axiosOrders';
 
 class Auth extends Component {
 // we are managing the state within this local state and not the redux state.  becuase we are only the values that the users enter into the form inputs. so it makes more sense to use the local state for this.
@@ -40,7 +47,9 @@ class Auth extends Component {
       valid: false,
       touched: false
       }
-    }
+    },
+    // this sets it that we should be in signup mode initially.
+    isSignUp: true,
   }
 // we are copying the validity logic from ContactData to check for valid inputs.
 checkValidation(value, rules) {
@@ -90,6 +99,25 @@ inputChangedHandler = (event, controlName) => {
   this.setState({controls: updatedControls});
 }
 
+submitHandler = (event) => {
+  event.preventDefault();
+  // we need to pass email and password when executing.  so we are getting that info from the state. once it has been inputed, we then grab it with the code syntax below.
+  this.props.onAuth(this.state.controls.email.value, this.state.controls.password.value, this.state.isSignUp);
+}
+
+// now we need to create an off switch mode handler for switching between sign in and new user.
+switchAuthModeHandler = () =>
+// we are calling setState in it's function form which recevies an a prevState argument.
+    this.setState(prevState => {
+      // we return the object which gets merged with the old state.
+      // we are just switching values.
+      return {
+          isSignUp: !prevState.isSignUp
+      };
+    })
+
+}
+
   render () {
       // the logic for this form is similar to the ContactData logic.
     const formElementArray = [];
@@ -99,6 +127,8 @@ inputChangedHandler = (event, controlName) => {
           config: this.state.controls[key]
         });
       }
+
+
 
 // now we wantt to loop through it and create the form with the results of the loop.  we will map it into an array of jsx elements.
 
@@ -117,15 +147,57 @@ const form = formElementArray.map(formElement = (
         changed={(event) => this.inputChangedHandler(event, formElement.id)} />
 ));
 
+      // WE ARE ADDING A SPINNER TO SHOW US THAT SOMETHING IS LOADING...
+      if(this.props.loading) {
+        form = <Spinner />
+      }
+
+      // we are creating an error message. by default it might be null.  we do and if statement and return jsx. the 'message' property is only avail from firebase.
+      let errorMessage = null
+      if(this.props.error) {
+        errorMessage = (
+          <p>{this.props.error.message}</p>
+
+        )
+      }
+
     return (
       <div className={classes.Auth}>
-        <form>
+        // before we see something, we have to make sure we really store that error message.
+        {errorMessage}
+      // once we connected, now we can execte onAuth in our props everytime this form is submittd. to do that we need to set up a prop in the form field. we add an onSubmit handler.
+        <form onSubmit={this.submitHandler}>
           {form}
           <Button btnType='Success'>SUBMIT</Button>
         </form>
+        // we are adding a sign-in feature
+        // here we are replacing hardcoded 'signin' to dynamically generated signin if the current state is signup and signup if the current state is signin.
+        <Button
+          {/*adding clicked property=>in Button.js file, there's a click property attached to the onclick handler. =>. we are executing the switchAuthNodeHandler everytime the button is clicked.*/}
+          clicked={this.switchAuthModeHandler}
+          btntype="Danger">Switch to {this.state.isSignUp ? "SIGNIN" : "SIGNUP" }
+
+        </Button>
       </div>
     );
   }
 }
+// getting a slice of the state.  we are mapping a slice of the state to our local props
+// the 'auth' is from our index file where we combined reducers.  the loading propety is in our auth reducer.
+const mapStateToProps = state => {
+    return {
+      loading: state.auth.loading,
+      error: state.auth.error
+    }
+}
 
-export default Auth;
+// THIS ALLOWS US TO DISPATCH SOMTHING VIA PROPS IN THIS container
+const mapDispatchToProps = dispatch => {
+  return {
+    // use as a method and holds a reference to a method.
+      onAuth: (email, password, isSignUp) => dispatch(actions.auth(email, password, isSignUp)),
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorHandler(Auth, axios));

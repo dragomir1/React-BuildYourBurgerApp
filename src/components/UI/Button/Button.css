@@ -20,7 +20,7 @@
 }
 
 .Danger {
-    color: #944317;
+    color: red;
 }
 
 .Button:disabled {
