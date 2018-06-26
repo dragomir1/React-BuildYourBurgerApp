@@ -25,7 +25,7 @@ class Orders extends Component {
 
 // YOU USE THIS TO ONLY FETCH ORDERS WHEN THE COMPONENT IS LOADED.
   componentDidMount() {
-    this.props.onFetchOrders();
+    this.props.onFetchOrders(this.props.token);
     //  WE ARE USING REDUX NOW.  THIS LOGC MOVES TO THE ORDERS ACTION.
     // // once you get data you want to do something with the response.  we want to set some state that contains the orders so it can then be outputted.
     // axios.get('/orders.json')
@@ -73,13 +73,16 @@ class Orders extends Component {
 const mapStateToProps = state => {
   return {
     orders: state.order.orders,
-    loading: state.order.loading
+    loading: state.order.loading,
+    // we need to get the token that we passed to dispatch.  we are now making the token avail on the token prop and we can pass it along.
+    token: state.auth.token
   }
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onFetchOrders: () => dispatch(actionCreators.fetchOrders());
+    // we are passing the token from our orders action.
+    onFetchOrders: (token) => dispatch(actionCreators.fetchOrders(token));
   }
 }
 //  we need to pass axios, otherwise it won't work.

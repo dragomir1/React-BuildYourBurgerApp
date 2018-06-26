@@ -130,7 +130,7 @@ class ContactData extends Component {
       orderData: formData
     }
 // once we dispatch the action to MAPSTATETODISPATCH, we need to pass it the the orderhandler function. and then execute it as well as pass the order
-    this.props.onBurgerOrder(order);
+    this.props.onBurgerOrder(order, this.props.token);
 // WE WAANT TO GET THE DATA FORM THE STATE.  WE ONLY CARE ABOUT THE NAME/VALUE PAIR.  IT NEEDS TO BE MAPPED TO EACH OTHER.
 
     // axios.post('/orders.json', order)
@@ -251,14 +251,15 @@ const mapStateToProps = state => {
   return {
     ings: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.totalPrice,
-    loading: state.order.loading
+    loading: state.order.loading,
+    toeken: state.auth.token
   }
 };
 
 // we are connecting this container to the dispatchable actions that were just created.
 const mapDispatchToProps = dispatch => {
   return {
-    onBurgerOrder: (orderData) => dispatch(actions.purchaseBurger(orderData))
+    onBurgerOrder: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
   };
 };
 

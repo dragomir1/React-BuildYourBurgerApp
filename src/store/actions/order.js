@@ -32,11 +32,11 @@ export const purchaseBurgerStart = () => {
 // once we get the response so that we're successful.  we dispatch purchaseBurgerSuccess action creator
 // before we send the post request, we need to execute the purchaseBurgerStart function. this will dispatch the action.
 
-export const purchaseBurger = (orderData) => {
+export const purchaseBurger = (orderData, token) => {
   return dispatch => {
     // BEFORE WE SEND THE POST REQUEST TO THE SERVER. WE WANT TO EXECUTE purchaseBurgerStart RIGHT AWAY TO DISPATCH THE ACTION.  WE WRAP IT IN A DISPATCH SO THAT THE ACTION RETURNED WHEN THE FUNCTION IS EXECUTED IS distpatchED TO THE THE STORE.
     dispatch(purchaseBurgerStart());
-    axios.post('/orders.json', orderData)
+    axios.post('/orders.json?auth=' + token, orderData)
     .then(response => {
       console.log(response.data)
       // response.data.name - .name is the specific property we are extracting.  response.data extracts everything as is. but if we want to be more specific and fetch specific propeties, we need to add additional properties at the end of it => response.data.name
@@ -81,11 +81,16 @@ export const fetchOrdersStart = () => {
 // we're getting the orders so we don't need an argument.
 
 //once this is complete, we need to handle the action types in the reducer as well.
-export const fetchOrders = () => {
+// we now need to pass this token to our Orders container.
+export const fetchOrders = (token) => {
+  // in order to recieve data from the reducer, we need to recieve the getState function in addition to the dispatch function. note: we are not doing this.  this is an FYI for down the road.
   return dispatch => {
     // we need to dispatch fetchOrdersStart to set loading to true.  the loading prop is in the orders reducer
     dispatch(fetchOrdersStart());
-    axios.get('/orders.json')
+    // this is where we add the token we got back from firebase when authenticating.
+    // we are adding code that will give us access to protected resources once we are authenticated and have a token.
+    // we need to recieve the token which is stored in our auth reducer. we can do this by recieving the 'getstate' function in addition to the dispatch function.  getstate function will give us access to the state in the reducer file.
+    axios.get('/orders.json?auth=' + token)
     .then(res => {
       //  WE ARE TRANSFORMING DATE WE ARE GETTING BACK.  THIS DOESN'T GO IN THE REDUCER BECUASE IF YOU EVER CHANGE THE BACK END DATA FORMAT, YOU NEED TO CHANGE THE DATA FORMAT IN THE REDUCER.  REDUCER IS WHAT UPDATES THE STATE. HERE WE GET THE DATA IN THE FORMAT WE WANT TO STORE IT IN.
       const fetchedOrders = [];

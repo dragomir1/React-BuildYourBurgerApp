@@ -7,7 +7,7 @@
 
 
  const initialState = {
-   idtoken: null,
+   token: null,
    userId: null,
    error: null,
    loading: false
@@ -24,7 +24,7 @@ const authStart = (state = initialState, action) => {
 
 const authSuccess = (state = initialState, action) => {
   return updateObject(state, {
-      token: action.idToken,
+      token: action.token,
       userId: action.userId,
       error: null,
       // set this to false becuase we're done.
