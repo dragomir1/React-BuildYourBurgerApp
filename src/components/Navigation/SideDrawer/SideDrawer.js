@@ -18,7 +18,9 @@ const sideDrawer = (props) => {
           <Logo />
         </div>
         <nav>
-          <Navitems />
+          // here we create a new prop and pass the isAuth prop from the Layout.js file.  inturn we will be passing these to the navitems
+          // Here isAuthenticated will be passed to navitems as a prop and we pass isAuth as a prop to that.  we also pass it to the SideDrawer file.
+          <Navitems isAuthenticated={props.isAuth} />
         </nav>
       </div>
     </Aux>

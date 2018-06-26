@@ -5,6 +5,10 @@ import Toolbar from '../../components/Navigation/Toolbar/Toolbar';
 import SideDrawer from '../../components/Navigation/SideDrawer/SideDrawer';
 
 
+//  WE ARE CONNECT THE LAYOUT TO THE REDUX STORE.  SO THAT WE CAN PASS THE AUTH information TO TOOLBAR AND SIDEDRAWER WHICH THEN IN TURN COULD PASS IT TO NAVIGATION ITEMS.
+import { connect } from 'react-redux';
+
+
 class Layout extends Component {
 
   state= {
@@ -23,8 +27,13 @@ class Layout extends Component {
   render () {
     return (
       <Aux>
-        <Toolbar drawerToggleClicked={this.sideDrawerToggleHandler} />
+        // adding a new prop and passing isAuthenticated.  Now we need to edit the these two componemts to be able to use the new prop.
+        <Toolbar
+          isAuth={this.props.isAuthenticated}
+          drawerToggleClicked={this.sideDrawerToggleHandler} />
+        // adding a new prop and passing isAuthenticated
         <SideDrawer
+          isAuth={this.props.isAuthenticated}
           open={this.state.showSideDrawer}
           closed={this.sideDrawerClosedHandler}/>
         <main className={classes.Content}>
@@ -35,4 +44,9 @@ class Layout extends Component {
   }
 }
 
-export default Layout;
+// here we are getting the token slice of the state.  here we are saying if the authentication is not null, isAuthenticated is then true.  the person has been authenticated.
+const mapStateToProps = state => {
+  isAuthenticated: state.auth.token !==null,
+}
+
+export default connect(mapStateToProps)(Layout);
