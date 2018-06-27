@@ -10,7 +10,8 @@ import Navitem from './Navitem/Navitem';
 const navitems = (props) => (
   <ul className={classes.Navitems}>
     <Navitem link="/" exact>Burger Builder</Navitem>
-    <Navitem link="/orders">Orders</Navitem>
+    // here we are setting it up so that users only see 'orders' if they are authenticated. otherwise they dont'
+    {props.isAuthenticated ? <Navitem link="/orders">Orders</Navitem> : null}
     {!props.isAuthenticated
       ? <Navitem link="/auth">Authenticate</Navitem>
       : <Navitem link="/logout">Logout</Navitem>

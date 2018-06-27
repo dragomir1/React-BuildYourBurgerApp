@@ -12,9 +12,6 @@ import { connect } from 'react-redux';
 import * as actionCreators from '../../store/actions/index';
 import axios from '../../axiosOrders';
 
-
-
-
 class BurgerBuilder extends Component {
 
   state = {
@@ -74,7 +71,14 @@ updatePurchaseState (ingredients) {
 // }
 
 purchaseHandler = () => {
-  this.setState({purchasing: true});
+  // this method is passed to the ordered handler which in turn is passed to the buildControls butoon and executed when clicked. we are checking for authentication.  if they are not, we redirect them to the sign in page.
+  let isAuth = null;
+  if(this.props.isAuthenticated) {
+    this.setState({purchasing: true});
+  } else {
+    // we are using the history pro which is coming for the react router.  we are pushing the user to the auth page.
+    this.props.history.push('/auth');
+  }
 }
 
 cancelOrderHandler = () => {
@@ -144,7 +148,10 @@ continueOrderHandler = () => {
           disabled={disabledInfo}
           {/*WE CALL THIS HANDELER AND PASS THE INGREDIENTS TO RETURN THE RESULTS OF THIS FUNCITON CALL. WE WANT TO EXECUTE THIS BECUASE WE WANT THE UPDTED RESULTS EVERYTIME IT GETS REDEERED.  OTHERWISE HOW ARE YOU GOING TO KNOW THE ORDER?*/}
           toBePurchased={this.updatePurchaseState(this.props.ings)}
+          {/*the ordered handler is bound to the purchaseHandler method.  this is then passed to the butotn in the build controls that is bound to the onClick method and executed when clicked.*/}
           ordered={this.purchaseHandler}
+            {/*we are using the isAuthenticated prop mapped to propState.  Now we move to the BuildControls Component*/}
+          isAuthenticated={this.props.isAuthenticated}
           price={this.props.price} />
       </Aux>
     );
@@ -175,7 +182,9 @@ const mapStateToProps = state => {
     price: state.burgerBuilder.totalPrice,
     // once we set the FETCH_INGREDIENTS_FAIL reducer and it's logic, we need to get info about an error.
     error: state.burgerBuilder.error,
-    purchased: state.order.purchased
+    purchased: state.order.purchased,
+    // this is for setting up the users to sign in if they want to continue to purchase their burger.  this should be passed on to build controls.
+    isAuthenticated: state.auth.token !== null
   };
 }
 // // the second argument. which kind of actions you want to dispatch in the container.

@@ -12,6 +12,9 @@ import { connect } from 'react-redux';
 import ErrorHandler from '../../hoc/ErrorHandler/ErrorHandler';
 import axios from '../../axiosOrders';
 
+// importing redirect fromt the router to redirect the users if they are authenticated.
+import { Redirect } from 'react-router-dom';
+
 class Auth extends Component {
 // we are managing the state within this local state and not the redux state.  becuase we are only the values that the users enter into the form inputs. so it makes more sense to use the local state for this.
 
@@ -160,9 +163,16 @@ const form = formElementArray.map(formElement = (
 
         )
       }
+      //this is the redirect code to check if users are authenticated and if so, redirect them to the appropriate place. in this case the main burgerBuilder page.
+      let authRedirect = null //by default it's null.
+      if(this.props.isAuthenticated) {
+          authRedirect = <Redirect to="/" />;
+
+      }
 
     return (
       <div className={classes.Auth}>
+        {authRedirect}
         // before we see something, we have to make sure we really store that error message.
         {errorMessage}
       // once we connected, now we can execte onAuth in our props everytime this form is submittd. to do that we need to set up a prop in the form field. we add an onSubmit handler.
@@ -187,7 +197,9 @@ const form = formElementArray.map(formElement = (
 const mapStateToProps = state => {
     return {
       loading: state.auth.loading,
-      error: state.auth.error
+      error: state.auth.error,
+      // we are redirecting the users once they are authenticated.  we need to get access to the token slice of the state.  if it's not null, they are authenticated
+      isAuthenticated: state.auth.token !== null
     }
 }
 

@@ -22,7 +22,9 @@ const buildControls = (props) => (
     ))}
     <button className={classes.OrderButton}
     disabled={!props.toBePurchased}
-    onClick={props.ordered}>ORDER NOW</button>
+    {/*we are passing the isAuthenticated prop to this button.  if the user is authenticated, then they can purchase.  otherwise they need to sign in to continue.  this is a ternary expression*/}
+    {/*We need to make sure the button does the right thing now. we want this button only to work if authenticated.  if not we want to redirect to sign up page once the button is clicked. 'onCLick', executes the ordered method. which is passed from burgerbuilder.*/}
+    onClick={props.ordered}>{props.isAuthenticated ? "ORDER NOW" : "SIGN UP TO ORDER"}</button>
   </div>
 
 
