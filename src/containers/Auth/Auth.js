@@ -164,6 +164,11 @@ const form = formElementArray.map(formElement = (
         )
       }
       //this is the redirect code to check if users are authenticated and if so, redirect them to the appropriate place. in this case the main burgerBuilder page.
+      // HERE WE REDIRECT THE USER AFTER SIGNING IN.
+      // WE SHOULD HAVE TWO DIFERENT REDIRECTS.
+          // 1) to just '/'
+          // 2) to the checkout page.
+          // A DYNAMIC APPROACH WOULD BE TO STORE THE PATH IN THE REDUX STORE.
       let authRedirect = null //by default it's null.
       if(this.props.isAuthenticated) {
           authRedirect = <Redirect to="/" />;

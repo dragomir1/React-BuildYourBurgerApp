@@ -77,6 +77,8 @@ purchaseHandler = () => {
     this.setState({purchasing: true});
   } else {
     // we are using the history pro which is coming for the react router.  we are pushing the user to the auth page.
+    // we are using the onSetRedirectPath prop to dispatch an action we can place it either beofre or after the redirect to the auth page.
+    this.props.onSetRedirectPath('/checkout')
     this.props.history.push('/auth');
   }
 }
@@ -197,7 +199,10 @@ const mapDispatchToProps = dispatch => {
     // ONCE WE DISPATCH THIS ACTION, WE NEED TO CALL IT IN componentDidMount METHOD.
     onInitIngredients: () => dispatch(actionCreators.initIngredients()),
     // we are reapdy to dispatch this action where we initialize the burger purchase action. we call it right before we push to the checkout.
-    onInitPurchase: () => dispatch(actionCreators.purchaseInit())
+    onInitPurchase: () => dispatch(actionCreators.purchaseInit()),
+    // this functino will dispatch an action when executed to dynamically redirect to path.
+    onSetRedirectPath: (path) => dispatch(actionCreators.setAuthRedirectPath(path)),
+
   }
 }
 

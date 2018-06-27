@@ -2,6 +2,14 @@
 import * as actionTypes from './actionTypes';
 import axios from 'axios';
 
+// creating action creator for the path redirection. we return the action which should be dispatched.  we now need to handle this action in the auth reducer.
+export const setAuthRedirectPath = (path) => {
+  return {
+    type: actionTypes.SET_AUTH_REDIRECT_PATH,
+    path: path
+  };
+};
+
 export const authStart = () => {
   return {
     type: actionTypes.AUTH_START

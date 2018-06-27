@@ -11,7 +11,9 @@ const initialState = {
   },
   totalPrice: 0,
   // we are setting error to false and will use this state property for our asych call in our burgerbuilding.js  in actions folder.  if we fail to load the ingredients.  we distpatch an action that loading failed.
-  error: false
+  error: false,
+  // HERE ARE ARE SETTING UP THE FOLLOWING: IF WE BUILD A BURGER BUT NOT AUTHICATED, AFTER WE BUILD IT AND WE SIGN UP WE ARE THEN REDIRECT TO CHECKOUT PAGE FROM THE AUTHENTICTE PAGE SO WE CAN CONTINUE WITH OUR ORDER. this sets the building to false initally.
+  building: false
 };
 
 // globally scoped.
@@ -49,7 +51,9 @@ const reducer = (state = initialState, action) => {
           [action.ingredientName]: state.ingredients[action.ingredientName] + 1
         },
         {/*this is how we manipulate and update the price.*/}
-        totalPrice: state.totalPrice + INGREDIENT_PRICES[action.ingredientName]
+        totalPrice: state.totalPrice + INGREDIENT_PRICES[action.ingredientName],
+        // we are setting this to indicate that we are working on the burger.
+        building: true
       };
     case actionTypes.REMOVE_INGREDIENT:
         return {
@@ -58,7 +62,9 @@ const reducer = (state = initialState, action) => {
             ...state.ingredients,
             [action.ingredientName]: state.ingredients[action.ingredientName] - 1
           },
-          totalPrice: state.totalPrice - INGREDIENT_PRICES[action.ingredientName]
+          totalPrice: state.totalPrice - INGREDIENT_PRICES[action.ingredientName],
+          // we are setting this to indicate that we are working on the burger.
+          building: true
 
         };
         // this code is executed when we get ingredients from the server.  so this is part of the asych code...we first wait to get the ingredients before we dispatch an action.
@@ -78,7 +84,9 @@ const reducer = (state = initialState, action) => {
       // when we call SET_INGREDIENTS we need to set the error in case we had the error earlier and now we dont
       error: false,
       // WE NEED TO RESET THE PRICE ONCE WE ARE DONE ORDERING THE BURGER.
-      totalPrice: 0
+      totalPrice: 0,
+      // setting this to false becuase we are not building yet.  we reloaded the page.
+      building: false
     // this is part of the fail action creator.
     case actionTypes.FETCH_INGREDIENTS_FAIL:
     return {
