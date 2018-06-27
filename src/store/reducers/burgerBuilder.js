@@ -13,6 +13,8 @@ const initialState = {
   // we are setting error to false and will use this state property for our asych call in our burgerbuilding.js  in actions folder.  if we fail to load the ingredients.  we distpatch an action that loading failed.
   error: false,
   // HERE ARE ARE SETTING UP THE FOLLOWING: IF WE BUILD A BURGER BUT NOT AUTHICATED, AFTER WE BUILD IT AND WE SIGN UP WE ARE THEN REDIRECT TO CHECKOUT PAGE FROM THE AUTHENTICTE PAGE SO WE CAN CONTINUE WITH OUR ORDER. this sets the building to false initally.
+
+  // WE CAN USE THIS PORPOTERY IN THE AUTH CONTAINER TO CHANGE THE REDIRECT PATH BACK IF WE THINK THE USER IS NOT BUILDING A BURGER ANYMORE.
   building: false
 };
 

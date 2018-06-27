@@ -54,6 +54,16 @@ class Auth extends Component {
     // this sets it that we should be in signup mode initially.
     isSignUp: true,
   }
+// HERE WE ARE dispatching THE onSetRedirectPath IF WE ARE NOT BUILDING A BURGER. IN ODER TO PROPERLY DISPATCH THIS WE NEED TO GET THE 'building' prop and map it to state so we can have access to that.
+// we also need the authRedirectPath property from our auth reducer. needs to be mapped.
+// we also need to dispatch a change in the redirect path. so we need to dipatch the action.
+  componentDidMount () {
+    // WE HAVE TO MAKE SURE THAT WE RESET THE PATH IF WE REACH THIS PAGE WHILE NOT BUILDING A BURGER.
+    // this says,if we are NOT building the burger and the path is NOT '/' that means that we're trying to redirect to check out even though we are not building a burger. so if we're not buidling a burger and the path is something other than '/' then we redirect them to '/' instead.
+    if(!this.props.buildingBurger && this.props.authRedirectPath !== '/') {
+      this.props.onSetAuthRedirectPath();
+    }
+  }
 // we are copying the validity logic from ContactData to check for valid inputs.
 checkValidation(value, rules) {
   // THIS FIXES THE VALIDAITON FLAW MENTIONED BELOW.
@@ -168,10 +178,13 @@ const form = formElementArray.map(formElement = (
       // WE SHOULD HAVE TWO DIFERENT REDIRECTS.
           // 1) to just '/'
           // 2) to the checkout page.
-          // A DYNAMIC APPROACH WOULD BE TO STORE THE PATH IN THE REDUX STORE.
+          // A DYNAMIC APPROACH WOULD BE TO STORE THE PATH IN THE REDUX STORE TO DYNAMICALLY REPLACE IT.
+          // WE ARE STORING THE PATH IN THE AUTH REDUCER.
       let authRedirect = null //by default it's null.
       if(this.props.isAuthenticated) {
-          authRedirect = <Redirect to="/" />;
+          // authRedirect = <Redirect to="/" />;
+          //  we are binding the redirect page to be dymanic.  BUT WE HAVE TO MAKE SURE THAT WE RESET THE PATH IF WE REACH THIS PAGE WHILE NOT BUILDING A BURGER.  WE DO THIS IN componentDidMount.
+          authRedirect = <Redirect to={this.props.authRedirectPath} />;
 
       }
 
@@ -204,7 +217,11 @@ const mapStateToProps = state => {
       loading: state.auth.loading,
       error: state.auth.error,
       // we are redirecting the users once they are authenticated.  we need to get access to the token slice of the state.  if it's not null, they are authenticated
-      isAuthenticated: state.auth.token !== null
+      isAuthenticated: state.auth.token !== null,
+      // in order for us to redirect if the user is not building a burger we need to map this property.
+      buildingBurger: state.burgerBuilder.building,
+      // we are also mapping a slice of state from auth reducer.  we need acess to the authRedirectPath prop to use in this container.
+      authRedirectPath: state.auth.authRedirectPath,
     }
 }
 
@@ -213,6 +230,8 @@ const mapDispatchToProps = dispatch => {
   return {
     // use as a method and holds a reference to a method.
       onAuth: (email, password, isSignUp) => dispatch(actions.auth(email, password, isSignUp)),
+      // we are dispatching the redirect action creator so we can use it in this prop. this resets it back to it's basic form.  so you can hardcod the root path.
+      onSetAuthRedirectPath: () => dispatch(actions.setAuthRedirectPath('/')),
   }
 }
 
