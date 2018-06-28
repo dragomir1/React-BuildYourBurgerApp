@@ -127,7 +127,9 @@ class ContactData extends Component {
     const order = {
       ingredients: this.props.ings,
       price: this.props.price,
-      orderData: formData
+      orderData: formData,
+      // this is a newly mapped prop to get userId of a specific order.
+      userId: this.props.userId
     }
 // once we dispatch the action to MAPSTATETODISPATCH, we need to pass it the the orderhandler function. and then execute it as well as pass the order
     this.props.onBurgerOrder(order, this.props.token);
@@ -252,7 +254,9 @@ const mapStateToProps = state => {
     ings: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.totalPrice,
     loading: state.order.loading,
-    token: state.auth.token
+    token: state.auth.token,
+    // this sets up the display of specific orders.
+    userId: state.auth.userId
   }
 };
 

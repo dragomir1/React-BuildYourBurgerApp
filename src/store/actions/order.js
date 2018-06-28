@@ -82,15 +82,21 @@ export const fetchOrdersStart = () => {
 
 //once this is complete, we need to handle the action types in the reducer as well.
 // we now need to pass this token to our Orders container.
-export const fetchOrders = (token) => {
+
+// the best way to display user specific orders is to fetch them.
+
+// we are passing userId so that we can fetch speciic user data from the server. but we also need to make sure we get the user id. we need to go to the place where we execute fetchOrders.  that's in the ORders container.
+export const fetchOrders = (token, userId) => {
   // in order to recieve data from the reducer, we need to recieve the getState function in addition to the dispatch function. note: we are not doing this.  this is an FYI for down the road.
   return dispatch => {
     // we need to dispatch fetchOrdersStart to set loading to true.  the loading prop is in the orders reducer
     dispatch(fetchOrdersStart());
+    // we are setting up code to fetch specific user data '&orderBy' is a query parameter understood by firebase. this orders the data but this also tells firebase to filter by it
+    const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"';
     // this is where we add the token we got back from firebase when authenticating.
     // we are adding code that will give us access to protected resources once we are authenticated and have a token.
     // we need to recieve the token which is stored in our auth reducer. we can do this by recieving the 'getstate' function in addition to the dispatch function.  getstate function will give us access to the state in the reducer file.
-    axios.get('/orders.json?auth=' + token)
+    axios.get('/orders.json' + queryParams)
     .then(res => {
       //  WE ARE TRANSFORMING DATE WE ARE GETTING BACK.  THIS DOESN'T GO IN THE REDUCER BECUASE IF YOU EVER CHANGE THE BACK END DATA FORMAT, YOU NEED TO CHANGE THE DATA FORMAT IN THE REDUCER.  REDUCER IS WHAT UPDATES THE STATE. HERE WE GET THE DATA IN THE FORMAT WE WANT TO STORE IT IN.
       const fetchedOrders = [];
