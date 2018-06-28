@@ -14,7 +14,10 @@ export const setAuthRedirectPath = (path) => {
 // we want to dispatch multiple actions from this function.
 // the getItem method gets the item from localstorage
 // this is a pure utility action creator.
-// THIS ENTIRE UTILITY FUNCTION AUTOMATICALLY LOCKS THE USER IN IF WE HAVE A TOKEN. 
+// THIS ENTIRE UTILITY FUNCTION AUTOMATICALLY LOCKS THE USER IN IF WE HAVE A TOKEN.
+
+// export it in the index file. then on to the APP.js file to connect to the store, create mapDispatchToProps.
+
 export const authCheckState = () => {
   return dispatch => {
     const token = localStorage.getItem('token');
@@ -22,14 +25,14 @@ export const authCheckState = () => {
       dispatch(logout());
     } else {
       const expirationTime = new Date(localStorage.getItem('expirationDate'));
-      if(expirationDate > new Date()) {
+      if(expirationDate < new Date()) {
         dispatch(logout());
       } else {
         const userId = localStorage.getItem('userId');
         dispatch(authSuccess(token, userId));
         // the amount of seconds until we should be logged out. this code says:
-        // this is passing the difference between the future date in seconds and the current date in seconds.  the difference is the expiring time in seconds.
-        dispatch(checkAuthTimeout(expirationDate.getSeconds() - new Date().getSeconds()));
+        // this is passing the difference between the future date in seconds and the current date in seconds.  the difference is the expiring time in milli-seconds.
+        dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000 ));
         }
     }
   };
