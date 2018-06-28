@@ -78,7 +78,9 @@ purchaseHandler = () => {
   } else {
     // we are using the history pro which is coming for the react router.  we are pushing the user to the auth page.
     // we are using the onSetRedirectPath prop to dispatch an action we can place it either beofre or after the redirect to the auth page.
-    this.props.onSetRedirectPath('/checkout')
+
+      // NOW WE WANT TO SET THE PATH TO '/' IF THE USER CLICKED ONTHE AUTHENTICATE BUTTON IN NAGIVATION. WE DO THIS IN THE AUTH CONTAINER.
+    this.props.onSetRedirectPath('/checkout');
     this.props.history.push('/auth');
   }
 }

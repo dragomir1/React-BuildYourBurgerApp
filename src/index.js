@@ -29,11 +29,12 @@ import authReducer from './store/reducers/auth';
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 // THIS CONST COMBINES BOTH REDUCERS INTO ONE JS OBJECT.  WE THEN PASS IT TO createStore.  THIS APP WILL BREAK  BECUASE WE HAVE DIFFERENT SLICES OF STATE => burgerBuilder AND order.  WE NEED TO UPDATE THIS IN THE CONTAINER THAT UTILIZES THESE REDUCERS.
-// THIS IS THE GLOBAL ROOT REDUCER. 
+// THIS IS THE GLOBAL ROOT REDUCER.
 const rootReducer = combineReducers({
   burgerBuilder: burgerBuilderReducer,
   order: orderReducer,
-  auth: authReducer
+  auth: authReducer,
+  
 });
 // the second argument sets up our redux dev tools.
 // const store = createStore(burgerBuilderReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());

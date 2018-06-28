@@ -54,6 +54,15 @@ class Auth extends Component {
     // this sets it that we should be in signup mode initially.
     isSignUp: true,
   }
+  // *** a viaual representation of the REDIRCTING USERS TO THE CHECKOUT PAGE.
+        // 1-MAIN PAGE BURGER BUILDER - WE BUILD THE Burger
+        // 2- THE BUTTON SAYS "SIGN UP TO ORDER" => CLICK THE BUTTON...
+        // 3- GOES TO THE AUTHENTICATE PAGE => DON'T SIGN IN CLICK BURGER BUILDER.  IT SHOULD BE RESET.
+        // 4 - CLICK AUTHENTICATE. SIGN IN...
+        // 5 = THEN IT GOES TO THE FRONT PAGE AGAIN.
+
+
+        
 // HERE WE ARE dispatching THE onSetRedirectPath IF WE ARE NOT BUILDING A BURGER. IN ODER TO PROPERLY DISPATCH THIS WE NEED TO GET THE 'building' prop and map it to state so we can have access to that.
 // we also need the authRedirectPath property from our auth reducer. needs to be mapped.
 // we also need to dispatch a change in the redirect path. so we need to dipatch the action.

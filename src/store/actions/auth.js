@@ -10,6 +10,33 @@ export const setAuthRedirectPath = (path) => {
   };
 };
 
+// this function checks the authentication state. we are using this to perisist the auth state with localStorage.
+// we want to dispatch multiple actions from this function.
+// the getItem method gets the item from localstorage
+// this is a pure utility action creator.
+// THIS ENTIRE UTILITY FUNCTION AUTOMATICALLY LOCKS THE USER IN IF WE HAVE A TOKEN. 
+export const authCheckState = () => {
+  return dispatch => {
+    const token = localStorage.getItem('token');
+    if(!token) {
+      dispatch(logout());
+    } else {
+      const expirationTime = new Date(localStorage.getItem('expirationDate'));
+      if(expirationDate > new Date()) {
+        dispatch(logout());
+      } else {
+        const userId = localStorage.getItem('userId');
+        dispatch(authSuccess(token, userId));
+        // the amount of seconds until we should be logged out. this code says:
+        // this is passing the difference between the future date in seconds and the current date in seconds.  the difference is the expiring time in seconds.
+        dispatch(checkAuthTimeout(expirationDate.getSeconds() - new Date().getSeconds()));
+        }
+    }
+  };
+};
+
+
+
 export const authStart = () => {
   return {
     type: actionTypes.AUTH_START
@@ -35,9 +62,16 @@ export const authFail = (error) => {
 };
 
 
+// *** TO FETCH THE TOKEN WHEN WE LOG IN - WE NEED TO GO TO OUR APP.JS FILE.
+
 // this is a logout action creator that we'll be using internally in the checkAuthTimeout.
 // this logout action creator will be used in setTimeout within the checkAuthTimeout function.
 export const logout = () => {
+  // we are removing the items from local storage when users Logout.
+  localStorage.removeItem('token');
+  localStorage.removeItem('expirationDate');
+  localStorage.removeItem('userId');
+
   return {
     type: actionTypes.AUTH_LOGOUT,
   };
@@ -90,6 +124,19 @@ export const auth = (email, password, isSignUp) => {
       console.log(response
         // we need to pass the idToken and userId everythime we dispatch the authSuccess function.
         // the 'localId' prop is in the console.log in the returned data.
+
+        // IF WE RELOAD THE PAGE WE LOST EVERYTHING BECAUSE REACT DOWNLOADS THE APPLICATAION AGAIN AND EXECTUES JS AGAIN..IT'S A NEW APP.
+        // WE NEED TO PERSIST OUR LOGIN STATE ACROSS OUR SESSIONS.
+        // TO PERSIST THE STATE REQUIRES A BROWSER API CALLED LOCALSTORAGE.  THE LOCALSTORAGE API IS BAKED INTO THE BROWSER SO WE CAN EASILY USE IT.
+        // WE PUT IT HERE BEUCASE WE ARE WORKING WITH THE TOKEN AS WELL AS THE expirationTime.
+        // the 'setitem' method stores the item in localStorage. it takes two arguments. the first one is the key so we can fetch it. and the second one is the actual item
+      localStorage.setItem('token', response.data.idToken);
+      // this is how we get the time.
+      // we are settting up and storing expirationDate in localStorage whnever we acquire a token.
+      const expirationDate = new Date(Date().getTime() + response.data.expiresIn * 1000);
+      localStorage.setItem('expirationDate', expirationDate);
+        // the 'localId' prop is in the console.log in the returned data.
+      localStorage.setItem('userId', response.data.localId);
       dispatch(authSuccess(response.data.idToken, response.data.localId));
       // we are dispatch this function when we get back a succes response.  the 'expiresIn' property is in the console on chrome.
       dispatch(checkAuthTimeout(response.data.expiresIn));
