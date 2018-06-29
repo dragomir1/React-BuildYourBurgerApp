@@ -24,6 +24,13 @@ import burgerBuilderReducer from './store/reducers/burgerBuilder';
 import orderReducer from './store/reducers/order';
 import authReducer from './store/reducers/auth';
 
+// this registers the saga and makes the store aware of it and that it's able to use.
+import createSagaMiddleware from 'redux-saga';
+// we also need to inport the saga we created.
+import { logoutSaga } from './store/sagas/auth';
+
+// we are executing the createSagaMiddleware function and storing it in a var.
+const sagaMiddleware = createSagaMiddleware();
 
 // this sets up the redux devtools store in the browser. this goes before the store is created.
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -34,14 +41,19 @@ const rootReducer = combineReducers({
   burgerBuilder: burgerBuilderReducer,
   order: orderReducer,
   auth: authReducer,
-  
+
 });
 // the second argument sets up our redux dev tools.
 // const store = createStore(burgerBuilderReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 // ONCE WE IMPORT THE PROVIDER, CREATESTORE dependencIES, WE THEN CREATE OUR STORE.
 // we are adding a second argument, applyMiddleware and passing thunk, which allows for asynch code.  THis sets us up for asynch code.
-const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
+//  WE ARE ADDING THE sagaMiddleware CONST TO OUR STORE AS WELL.
+const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk, sagaMiddleware)));
+
+// AFTER WE DO THAT WE CAN USE THE SAGAMIDDLEWARE AND RUN A SAGA.
+sagaMiddleware.run(logoutSaga);
+
 
 // AFTER STORE IS CREATED WE SET THE STORE PROPERTY ON THE PROVIDER AND PASS IT THE STORE.
 const app = (
