@@ -27,7 +27,7 @@ import authReducer from './store/reducers/auth';
 // this registers the saga and makes the store aware of it and that it's able to use.
 import createSagaMiddleware from 'redux-saga';
 // we also need to inport the saga we created.
-import { logoutSaga } from './store/sagas/auth';
+import { watchAuth } from './store/sagas/index';
 
 // we are executing the createSagaMiddleware function and storing it in a var.
 const sagaMiddleware = createSagaMiddleware();
@@ -52,7 +52,7 @@ const rootReducer = combineReducers({
 const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk, sagaMiddleware)));
 
 // AFTER WE DO THAT WE CAN USE THE SAGAMIDDLEWARE AND RUN A SAGA.  we need to pass it the action creator function.
-sagaMiddleware.run(logoutSaga);
+sagaMiddleware.run(watchAuth);
 
 
 

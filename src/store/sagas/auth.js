@@ -10,7 +10,10 @@
 
 // we import the put function which basically acts like a return.  so when you use put, you are returning data.
 import { put } from 'redux-saga/effects';
-import * as actionTypes from '../actions/actionTypes';
+// we dont need to import this file becuase we no longer hard code action creators anymore.
+// import * as actionTypes from '../actions/actionTypes';
+// we import the actions from index so we can use the action creators in our sagas.
+import * as actions from '../actions/index';
 
 // CREATING A SAGA. SAGAS TAKE AN ACTION ARGUMENT.  THEY ARE REALATED TO ACTIONS.  we add a * that converts this function to a generator.  A generator is a function which can be executed incremetally.  we can puase during function execution. one line waits while the previous line finishes it's actions
 //
@@ -22,7 +25,7 @@ export function* logoutSaga (action) => {
   yield localStorage.removeItem('expirationDate');
   yield localStorage.removeItem('userId');
   // put acts like 'return'.  so it will dispath the action once execution of previous steps are finished.
-  yield put ({
-    type: actionTypes.AUTH_LOGOUT,
-  });
-}
+
+  // we execute this action creator that we import from action index, which was imported from auth action file.
+  yield put (actions.logoutSucceed());
+};
