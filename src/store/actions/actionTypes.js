@@ -27,6 +27,9 @@ export const AUTH_START = 'AUTH_START';
 export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAIL = 'AUTH_FAIL';
 
+// this action creator is the step before the logout..this is being used in sagas. 
+export const AUTH_INITIATE_LOGOUT = 'AUTH_INITIATE_LOGOUT';
+
 export const AUTH_LOGOUT = 'AUTH_LOGOUT';
 
 //  this actiontype is to dynamcially change the path depending on user authntication.  we now need to add a new action creator in our auth file.

@@ -71,12 +71,16 @@ export const authFail = (error) => {
 // this logout action creator will be used in setTimeout within the checkAuthTimeout function.
 export const logout = () => {
   // we are removing the items from local storage when users Logout.
-  localStorage.removeItem('token');
-  localStorage.removeItem('expirationDate');
-  localStorage.removeItem('userId');
+  // ...now we are commenting out the side effects so that we can handle this logic in redux sagas.  we're going to dispath an action and create a new action type.  look at actionTypes.
+
+  // localStorage.removeItem('token');
+  // localStorage.removeItem('expirationDate');
+  // localStorage.removeItem('userId');
 
   return {
-    type: actionTypes.AUTH_LOGOUT,
+    // ype: actionTypes.
+    // so when we dispath logout, we initiate the AUTH_INITIATE_LOGOUT. the next step is to listen to this action creator and execute the sagas logout generator whenever we detect this.
+    type: actionTypes.AUTH_INITIATE_LOGOUT
   };
 };
 
