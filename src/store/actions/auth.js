@@ -1,6 +1,6 @@
 // this is where we set up authentication related action creators.
 import * as actionTypes from './actionTypes';
-import axios from 'axios';
+// import axios from 'axios';
 
 // creating action creator for the path redirection. we return the action which should be dispatched.  we now need to handle this action in the auth reducer.
 export const setAuthRedirectPath = (path) => {
@@ -18,25 +18,35 @@ export const setAuthRedirectPath = (path) => {
 
 // export it in the index file. then on to the APP.js file to connect to the store, create mapDispatchToProps.
 
+
+// handling this with saga.
+// 1.create generator function. once we complete the logic in the saga..we can delete this logic and just return an action Type.
+// we need to create a new action type and return it here as an object.
+// make sure to pass authCheckState in the index.
+//  NOW WE NEED TO TRIGGER IT IN SAGA.  TO DO SO WE NEED TO SET UP A LISTENER IN THE SAGA INDEX
 export const authCheckState = () => {
-  return dispatch => {
-    const token = localStorage.getItem('token');
-    if(!token) {
-      dispatch(logout());
-    } else {
-      const expirationTime = new Date(localStorage.getItem('expirationDate'));
-      if(expirationDate < new Date()) {
-        dispatch(logout());
-      } else {
-        const userId = localStorage.getItem('userId');
-        dispatch(authSuccess(token, userId));
-        // the amount of seconds until we should be logged out. this code says:
-        // this is passing the difference between the future date in seconds and the current date in seconds.  the difference is the expiring time in milli-seconds.
-        dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000 ));
-        }
-    }
-  };
-};
+  return {
+    type: actionTypes.AUTH_CHECK_INITIAL_STATE
+  }
+  // return dispatch => {
+  //   const token = localStorage.getItem('token');
+  //   if(!token) {
+  //     dispatch(logout());
+  //   } else {
+  //     const expirationTime = new Date(localStorage.getItem('expirationDate'));
+  //     if(expirationDate < new Date()) {
+  //       dispatch(logout());
+  //     } else {
+  //       const userId = localStorage.getItem('userId');
+  //       dispatch(authSuccess(token, userId));
+  //       // the amount of seconds until we should be logged out. this code says:
+  //       // this is passing the difference between the future date in seconds and the current date in seconds.  the difference is the expiring time in milli-seconds.
+  //       dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000 ));
+  //       }
+  //   }
+  // };
+// };
+}
 
 
 

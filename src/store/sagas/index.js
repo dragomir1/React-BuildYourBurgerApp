@@ -4,7 +4,7 @@
 import { takeEvery } from './redux-saga/effects';
 
 import * as actionTypes from '../actions/actionTypes';
-import { logoutSaga, checkAuthTimeoutSaga } from './auth';
+import { logoutSaga, checkAuthTimeoutSaga, authCheckStateSaga } from './auth';
 
 
 // in generators, we have to use the yeild keyword...which says 'execute this and wait for it to finish'.
@@ -17,4 +17,6 @@ export function* watchAuth() {
   yield takeEvery(actionTypes.AUTH_INITIATE_LOGOUT, logoutSaga);
   yield takeEvery(actionTypes.AUTH_CHECK_TIMEOUT, checkAuthTimeoutSaga);
   yield takeEvery(actionTypes.AUTH_USER, authUserSaga);
+  // don't forget to import.
+  yield takeEvery(actionTypes.AUTH_CHECK_INITIAL_STATE, authCheckStateSaga);
 }

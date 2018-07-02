@@ -103,3 +103,24 @@ export function* authUserSaga (action) => {
     yield put (actions.authFail(error.response.data.error));
   }
 }
+
+// i copied all the code from the auth action and now replacing it step by step.
+// ONCE IT'S DONE WE WANT TO HOO IT UP AND MAKE SURE IT GETS EXECUTED AT THE TIME OF APPLICATION.
+// GO BACK TO ACTION AUTH AND DELETE THE THIS LOGIC THAT IS NOW IN SAGA.  WE ARE GOING TO RETURN AN ACTION TYPE.
+export function* authCheckStateSaga (action) => {
+  const token = yield localStorage.getItem('token');
+  if(!token) {
+    yield put(actions.logout());
+  } else {
+    const expirationTime = yield new Date(localStorage.getItem('expirationDate'));
+    if(expirationDate < new Date()) {
+      yield put(actions.logout());
+    } else {
+      const userId = yield localStorage.getItem('userId');
+      yield put(actions.authSuccess(token, userId));
+      // the amount of seconds until we should be logged out. this code says:
+      // this is passing the difference between the future date in seconds and the current date in seconds.  the difference is the expiring time in milli-seconds.
+      yield put(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000 ));
+      }
+  }
+}
