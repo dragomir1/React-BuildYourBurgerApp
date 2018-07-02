@@ -11,7 +11,13 @@ export { addIngredient,
 export { purchaseBurger,
          purchaseInit,
          // once we do this we need to load it in componentDidMount as well as dispatch it in the orders container.
-         fetchOrders
+         fetchOrders,
+         purchaseBurgerSuccess,
+         purchaseBurgerFail,
+         purchaseBurgerStart,
+         fetchOrdersStart,
+         fetchOrdersFail,
+         fetchOrdersSuccess
 } from './order';
 
 export { auth,

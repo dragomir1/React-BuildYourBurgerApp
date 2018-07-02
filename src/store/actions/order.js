@@ -33,19 +33,24 @@ export const purchaseBurgerStart = () => {
 // before we send the post request, we need to execute the purchaseBurgerStart function. this will dispatch the action.
 
 export const purchaseBurger = (orderData, token) => {
-  return dispatch => {
-    // BEFORE WE SEND THE POST REQUEST TO THE SERVER. WE WANT TO EXECUTE purchaseBurgerStart RIGHT AWAY TO DISPATCH THE ACTION.  WE WRAP IT IN A DISPATCH SO THAT THE ACTION RETURNED WHEN THE FUNCTION IS EXECUTED IS distpatchED TO THE THE STORE.
-    dispatch(purchaseBurgerStart());
-    axios.post('/orders.json?auth=' + token, orderData)
-    .then(response => {
-      console.log(response.data)
-      // response.data.name - .name is the specific property we are extracting.  response.data extracts everything as is. but if we want to be more specific and fetch specific propeties, we need to add additional properties at the end of it => response.data.name
-      dispatch(purchaseBurgerSuccess(response.data.name, orderData))
-    })
-    .catch(error => {
-      dispatch(purchaseBurgerFail(error))
-    })
-  };
+  return {
+    type: actionTypes.PURCHASE_BURGER,
+    orderData: orderData,
+    token: token
+  }
+  // return dispatch => {
+  //   // BEFORE WE SEND THE POST REQUEST TO THE SERVER. WE WANT TO EXECUTE purchaseBurgerStart RIGHT AWAY TO DISPATCH THE ACTION.  WE WRAP IT IN A DISPATCH SO THAT THE ACTION RETURNED WHEN THE FUNCTION IS EXECUTED IS distpatchED TO THE THE STORE.
+  //   dispatch(purchaseBurgerStart());
+  //   axios.post('/orders.json?auth=' + token, orderData)
+  //   .then(response => {
+  //     console.log(response.data)
+  //     // response.data.name - .name is the specific property we are extracting.  response.data extracts everything as is. but if we want to be more specific and fetch specific propeties, we need to add additional properties at the end of it => response.data.name
+  //     dispatch(purchaseBurgerSuccess(response.data.name, orderData))
+  //   })
+  //   .catch(error => {
+  //     dispatch(purchaseBurgerFail(error))
+  //   })
+  // };
 };
 
 // AFTER WE CREATE AN ACTIONTYPE, WE CREATE AN actionCreator.  THEN WE NEED TO EXPORT IT TO THE INDEX.JS FILE.  // ONCE WE EXPORT PURCHASE_INIT, WE GO TO OUR Checkout CONTAINER AND LOAD IT IN componentDidMount.
@@ -87,29 +92,34 @@ export const fetchOrdersStart = () => {
 
 // we are passing userId so that we can fetch speciic user data from the server. but we also need to make sure we get the user id. we need to go to the place where we execute fetchOrders.  that's in the ORders container.
 export const fetchOrders = (token, userId) => {
-  // in order to recieve data from the reducer, we need to recieve the getState function in addition to the dispatch function. note: we are not doing this.  this is an FYI for down the road.
-  return dispatch => {
-    // we need to dispatch fetchOrdersStart to set loading to true.  the loading prop is in the orders reducer
-    dispatch(fetchOrdersStart());
-    // we are setting up code to fetch specific user data '&orderBy' is a query parameter understood by firebase. this orders the data but this also tells firebase to filter by it
-    const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"';
-    // this is where we add the token we got back from firebase when authenticating.
-    // we are adding code that will give us access to protected resources once we are authenticated and have a token.
-    // we need to recieve the token which is stored in our auth reducer. we can do this by recieving the 'getstate' function in addition to the dispatch function.  getstate function will give us access to the state in the reducer file.
-    axios.get('/orders.json' + queryParams)
-    .then(res => {
-      //  WE ARE TRANSFORMING DATE WE ARE GETTING BACK.  THIS DOESN'T GO IN THE REDUCER BECUASE IF YOU EVER CHANGE THE BACK END DATA FORMAT, YOU NEED TO CHANGE THE DATA FORMAT IN THE REDUCER.  REDUCER IS WHAT UPDATES THE STATE. HERE WE GET THE DATA IN THE FORMAT WE WANT TO STORE IT IN.
-      const fetchedOrders = [];
-      for( let key in res.data) {
-        fetchedOrders.push({
-          ...res.data[key],
-          id: key
-        });
-      }
-      dispatch(fetchOrdersSuccess(fetchedOrders);
-    })
-    .catch(error => {
-      dispatch(fetchOrdersFail(error));
-    });
+  return {
+    type: actionTypes.FETCH_ORDERS,
+    token: token,
+    userId: userId
   }
+  // // in order to recieve data from the reducer, we need to recieve the getState function in addition to the dispatch function. note: we are not doing this.  this is an FYI for down the road.
+  // return dispatch => {
+  //   // we need to dispatch fetchOrdersStart to set loading to true.  the loading prop is in the orders reducer
+  //   dispatch(fetchOrdersStart());
+  //   // we are setting up code to fetch specific user data '&orderBy' is a query parameter understood by firebase. this orders the data but this also tells firebase to filter by it
+  //   const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"';
+  //   // this is where we add the token we got back from firebase when authenticating.
+  //   // we are adding code that will give us access to protected resources once we are authenticated and have a token.
+  //   // we need to recieve the token which is stored in our auth reducer. we can do this by recieving the 'getstate' function in addition to the dispatch function.  getstate function will give us access to the state in the reducer file.
+  //   axios.get('/orders.json' + queryParams)
+  //   .then(res => {
+  //     //  WE ARE TRANSFORMING DATE WE ARE GETTING BACK.  THIS DOESN'T GO IN THE REDUCER BECUASE IF YOU EVER CHANGE THE BACK END DATA FORMAT, YOU NEED TO CHANGE THE DATA FORMAT IN THE REDUCER.  REDUCER IS WHAT UPDATES THE STATE. HERE WE GET THE DATA IN THE FORMAT WE WANT TO STORE IT IN.
+  //     const fetchedOrders = [];
+  //     for( let key in res.data) {
+  //       fetchedOrders.push({
+  //         ...res.data[key],
+  //         id: key
+  //       });
+  //     }
+  //     dispatch(fetchOrdersSuccess(fetchedOrders);
+  //   })
+  //   .catch(error => {
+  //     dispatch(fetchOrdersFail(error));
+  //   });
+  // }
 }

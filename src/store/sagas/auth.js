@@ -19,7 +19,7 @@ import * as actions from '../actions/index';
 //
 
 // we are importing a generator helper function. it delays the exection of the next step.
-import { delay } from 'reduc-saga';
+import { delay } from 'redux-saga';
 
 // in a generator, we need to prepend each step we execute with the 'yield' keyword it means that each step will wait for the previous step to finish execution.
 

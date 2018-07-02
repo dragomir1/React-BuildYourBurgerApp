@@ -9,7 +9,8 @@ import { logoutSaga,
          authCheckStateSaga
        } from './auth';
 
-import { initIngredientsSaga } from './burgerBuilder'
+import { initIngredientsSaga } from './burgerBuilder';
+import { purchaseBurgerSaga, fetchOrdersSaga } from './order';
 
 
 // in generators, we have to use the yeild keyword...which says 'execute this and wait for it to finish'.
@@ -26,5 +27,7 @@ export function* watchAuth() {
   yield takeEvery(actionTypes.AUTH_CHECK_INITIAL_STATE, authCheckStateSaga);
   //  we need to import the saga.
   // we also need to go back to burgerbuilder actions, delete the logic and return a new Action creator.
-  yield takeEvery(actionTypes.INIT_INGREDIENTS, initIngredientsSaga;)
+  yield takeEvery(actionTypes.INIT_INGREDIENTS, initIngredientsSaga);
+  yield takeEvery(actionTypes.PURCHASE_BURGER, purchaseBurgerSaga);
+    yield takeEvery(actionTypes.FETCH_ORDERS, fetchOrdersSaga);
 }

@@ -20,6 +20,9 @@ export const PURCHASE_INIT = 'PURCHASE_INIT';
 export const FETCH_ORDERS_START = 'FETCH_ORDERS_START';
 export const FETCH_ORDERS_SUCCESS = 'FETCH_ORDERS_SUCCESS';
 export const FETCH_ORDERS_FAIL = 'FETCH_ORDERS_FAIL';
+export const FETCH_ORDERS = 'FETCH_ORDERS';
+// action creator for the order dispatch.  the logic to that is in order saga.
+export const PURCHASE_BURGER = 'PURCHASE_BURGER';
 
 
 // authentication actionTypes
