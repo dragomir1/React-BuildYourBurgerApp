@@ -31,6 +31,7 @@ export const AUTH_FAIL = 'AUTH_FAIL';
 export const AUTH_INITIATE_LOGOUT = 'AUTH_INITIATE_LOGOUT';
 
 export const AUTH_CHECK_INITIAL_STATE = 'AUTH_CHECK_INITIAL_STATE';
+export const INIT_INGREDIENTS = 'INIT_INGREDIENTS';
 
 // adding a new action type for the checkAuthTimeoutSaga generator.  now we dispathc this action in the auth action file.
 export const AUTH_CHECK_TIMEOUT = 'AUTH_CHECK_TIMEOUT';

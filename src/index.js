@@ -54,6 +54,10 @@ const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk, s
 // AFTER WE DO THAT WE CAN USE THE SAGAMIDDLEWARE AND RUN A SAGA.  we need to pass it the action creator function.
 sagaMiddleware.run(watchAuth);
 
+// IF YOU ARE GOING TO CREATE ANOTHER SAGA, YOU NEED TO IMPORT ABOVE THEN CREATE A SEPERATE EXECTUION.
+// sagaMiddleware.run(watchAuth);
+
+
 
 
 // AFTER STORE IS CREATED WE SET THE STORE PROPERTY ON THE PROVIDER AND PASS IT THE STORE.

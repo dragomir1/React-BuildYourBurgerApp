@@ -3,6 +3,8 @@
 export { addIngredient,
           removeIngredient,
           initIngredients,
+          setIngredients,
+          fetchIngredientsFail
  } from './burgerBuilder';
 
  // ONCE WE EXPORT PURCHASE_INIT, WE GO TO OUR Checkout CONTAINER AND LOAD IT IN componentDidMount.

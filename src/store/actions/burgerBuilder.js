@@ -1,7 +1,7 @@
 
 // import actiontypes file.
 import * as actionTypes from './actionTypes';
-import axios from '../../axiosOrders';
+// import axios from '../../axiosOrders';
 
 
 // this file is where we create our our actions creators.
@@ -48,14 +48,21 @@ export const setIngredients = (ingredients) => {
 // the dispatch function is available due to redux-thunk.
 // we want to dispatch the setIngredients funtion once the asych code is done.
 //DONT FORGET THAT WE NEED TO DISPATCH THIS ACTION IN THE BurgerBuilder FILE IN OUR CTONTAINER
+
+
+// WE ARE PUTTING THIS LOGIC IN SAGA.
+  // CREATE GENERATOR FUNCTION IN BurgerBuilder and import dependencies.
 export const initIngredients = () => {
-  return dispatch => {
-    axios.get('https://react-burgerbuilder-86f26.firebaseio.com/ingredients.json')
-    .then( response => {
-      dispatch(setIngredients(response.data));
-    })
-    .catch(error => {
-      dispatch(fetchIngredientsFail());
-    })
-  };
+  return {
+    type: actionTypes.INIT_INGREDIENTS
+  }
+  // return dispatch => {
+  //   axios.get('https://react-burgerbuilder-86f26.firebaseio.com/ingredients.json')
+  //   .then( response => {
+  //     dispatch(setIngredients(response.data));
+  //   })
+  //   .catch(error => {
+  //     dispatch(fetchIngredientsFail());
+  //   })
+  // };
 };
