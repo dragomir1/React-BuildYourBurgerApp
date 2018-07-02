@@ -97,14 +97,24 @@ export const logoutSucceed = () => {
 // AFTER THIS NEED TO ADD LOGOUT IN THE REDUCER.
 // setTimeout uses time in miliseconds.  so you need to multipley by 1000 to add 1 second etc..expirationTime is 3600 miliseconds in setTimeout.  we times it by 1000 this will produce 3600 seconds.
 
+// THIS FUNCTION HAS SIDE EFFECTS THAT CAN GO THROUGH SAGA.  TO HANDLE THIS THROUGH SAGA
+      // 1. CREATE A NEW GENERATOR FUNCTION.
+      // 2. import a helper function.
 
+//now that we are using sagas, we don't neet this asynch code anymore.  we are running this through saga. now all we need to do is dispatch an action that leads to the checkAuthTimeoutSaga generator saga being started.
+// so we need to add a new actiontype, then dispatch it here. we also need to pass the argument.
+// THEN WE NEED TO GO TO INDEX SAGA AND IMPORT THE FUNCITON AND ADD A NEW LISTENER.
 export const checkAuthTimeout = (expirationTime) => {
-  return dispatch => {
-    setTimeout(() => {
-      dispatch(logout());
-
-    }, expirationTime * 1000);
-  };
+  return {
+    type: actionTypes.AUTH_CHECK_TIMEOUT,
+    expirationTime: expirationTime
+  }
+  // return dispatch => {
+  //   setTimeout(() => {
+  //     dispatch(logout());
+  //
+  //   }, expirationTime * 1000);
+  // };
 };
 
 
@@ -113,56 +123,67 @@ export const checkAuthTimeout = (expirationTime) => {
 // THIS IS THE REACT SIDE OF SENDING A POST REQUEST AND GETTING A TOKEN FROM BACK END.
 
 // WE NEED  THIRD ARGUMENT. TO ADDRESS IF ITS SIGNUP OR SIGNIN. AND SEND THEM TO ITS RELEVANT ENDPOINTS => sending the request to different URLS to different methods.
+
+
+// this is now being handled with a saga.
+// once we have created and complete the logic for the saga. we just return an action.  we need to creat the action type.
+// we then need to hook this function up with a watcher in the index saga file.
 export const auth = (email, password, isSignUp) => {
-  return dispatch  => {
-    dispatch(authStart());
-    // creating auth Data.  we need to create an object and pass several properties
-    // we need to pass the authData object as a second argument to axios when submitting a request.
-    const authData = {
-      email: email,
-      password: password,
-      returnSecureToken: true
-    }
-    // we are setting the default URL.
-    let url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=[AIzaSuJ5jKD6X35tTe-l34vBNIqWxgKSHFk3glY]';
-
-    if(!isSignUp) {
-      // setting to the other url if they are signing in.
-      let url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=[AIzaSuJ5jKD6X35tTe-l34vBNIqWxgKSHFk3glY]';
-    }
-    // we pass the url.
-    // Here we post our auth request and get back a response.  we need to pass along that response to our AUTH_SUCCESS function.  becuase AUTH_SUCCESS needs to passit on as well. otherwise we are not really doing anything with the data we extracted.
-    axios.post(url, authData)
-    // axios gives us a promise.
-    // WE NEED TO PASS THE DATA EXTRACTED TO UATH SUCCESS.
-    .then(response => {
-      console.log(response
-        // we need to pass the idToken and userId everythime we dispatch the authSuccess function.
-        // the 'localId' prop is in the console.log in the returned data.
-
-        // IF WE RELOAD THE PAGE WE LOST EVERYTHING BECAUSE REACT DOWNLOADS THE APPLICATAION AGAIN AND EXECTUES JS AGAIN..IT'S A NEW APP.
-        // WE NEED TO PERSIST OUR LOGIN STATE ACROSS OUR SESSIONS.
-        // TO PERSIST THE STATE REQUIRES A BROWSER API CALLED LOCALSTORAGE.  THE LOCALSTORAGE API IS BAKED INTO THE BROWSER SO WE CAN EASILY USE IT.
-        // WE PUT IT HERE BEUCASE WE ARE WORKING WITH THE TOKEN AS WELL AS THE expirationTime.
-        // the 'setitem' method stores the item in localStorage. it takes two arguments. the first one is the key so we can fetch it. and the second one is the actual item
-      localStorage.setItem('token', response.data.idToken);
-      // this is how we get the time.
-      // we are settting up and storing expirationDate in localStorage whnever we acquire a token.
-      const expirationDate = new Date(Date().getTime() + response.data.expiresIn * 1000);
-      localStorage.setItem('expirationDate', expirationDate);
-        // the 'localId' prop is in the console.log in the returned data.
-      localStorage.setItem('userId', response.data.localId);
-      dispatch(authSuccess(response.data.idToken, response.data.localId));
-      // we are dispatch this function when we get back a succes response.  the 'expiresIn' property is in the console on chrome.
-      dispatch(checkAuthTimeout(response.data.expiresIn));
-    })
-    .catch(err => {
-      console.log(err);
-      // we can access the error message we get back from fire base on this err object by accessing the original response
-
-      dispatch(authFail(err.response.data.error));
-    });
-  };
+  return {
+    type: actionTypes.AUTH_USER,
+    email: email,
+    password: password,
+    isSignUp: isSignUp
+  }
+  // return dispatch  => {
+  //   dispatch(authStart());
+  //   // creating auth Data.  we need to create an object and pass several properties
+  //   // we need to pass the authData object as a second argument to axios when submitting a request.
+  //   const authData = {
+  //     email: email,
+  //     password: password,
+  //     returnSecureToken: true
+  //   }
+  //   // we are setting the default URL.
+  //   let url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=[AIzaSuJ5jKD6X35tTe-l34vBNIqWxgKSHFk3glY]';
+  //
+  //   if(!isSignUp) {
+  //     // setting to the other url if they are signing in.
+  //     let url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=[AIzaSuJ5jKD6X35tTe-l34vBNIqWxgKSHFk3glY]';
+  //   }
+  //   // we pass the url.
+  //   // Here we post our auth request and get back a response.  we need to pass along that response to our AUTH_SUCCESS function.  becuase AUTH_SUCCESS needs to passit on as well. otherwise we are not really doing anything with the data we extracted.
+  //   axios.post(url, authData)
+  //   // axios gives us a promise.
+  //   // WE NEED TO PASS THE DATA EXTRACTED TO UATH SUCCESS.
+  //   .then(response => {
+  //     console.log(response
+  //       // we need to pass the idToken and userId everythime we dispatch the authSuccess function.
+  //       // the 'localId' prop is in the console.log in the returned data.
+  //
+  //       // IF WE RELOAD THE PAGE WE LOST EVERYTHING BECAUSE REACT DOWNLOADS THE APPLICATAION AGAIN AND EXECTUES JS AGAIN..IT'S A NEW APP.
+  //       // WE NEED TO PERSIST OUR LOGIN STATE ACROSS OUR SESSIONS.
+  //       // TO PERSIST THE STATE REQUIRES A BROWSER API CALLED LOCALSTORAGE.  THE LOCALSTORAGE API IS BAKED INTO THE BROWSER SO WE CAN EASILY USE IT.
+  //       // WE PUT IT HERE BEUCASE WE ARE WORKING WITH THE TOKEN AS WELL AS THE expirationTime.
+  //       // the 'setitem' method stores the item in localStorage. it takes two arguments. the first one is the key so we can fetch it. and the second one is the actual item
+  //     localStorage.setItem('token', response.data.idToken);
+  //     // this is how we get the time.
+  //     // we are settting up and storing expirationDate in localStorage whnever we acquire a token.
+  //     const expirationDate = new Date(Date().getTime() + response.data.expiresIn * 1000);
+  //     localStorage.setItem('expirationDate', expirationDate);
+  //       // the 'localId' prop is in the console.log in the returned data.
+  //     localStorage.setItem('userId', response.data.localId);
+  //     dispatch(authSuccess(response.data.idToken, response.data.localId));
+  //     // we are dispatch this function when we get back a succes response.  the 'expiresIn' property is in the console on chrome.
+  //     dispatch(checkAuthTimeout(response.data.expiresIn));
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     // we can access the error message we get back from fire base on this err object by accessing the original response
+  //
+  //     dispatch(authFail(err.response.data.error));
+  //   });
+  // };
 };
 
 // ONCE DONE WE NEED TO CONNECT OUR ACTIONS TO OUR AUTH.JS CONTAINER. BEFORE WE DO THAT WE NEED TO ADD THESE ACTION CREATORS TO THE INDEX.
